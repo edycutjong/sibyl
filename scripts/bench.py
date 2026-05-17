@@ -15,7 +15,7 @@ from pathlib import Path
 import numpy as np
 
 
-async def main():
+async def main() -> None:
     """Run benchmark against resolved events."""
     # Default to resolved events
     events_path = sys.argv[1] if len(sys.argv) > 1 else "data/fixtures/resolved_events.json"
