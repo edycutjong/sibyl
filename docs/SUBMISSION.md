@@ -1,10 +1,10 @@
-# OracleChain — Submission Materials
+# Sibyl — Submission Materials
 
 ## Project Title
-**OracleChain: Retrieval-Augmented Probabilistic Forecasting Agent**
+**Sibyl: Retrieval-Augmented Probabilistic Forecasting Agent**
 
 ## Emotional Hook
-A trader stares at a Kalshi contract for "Will the Fed raise rates in June?" priced at 42 cents. She knows the market is wrong — the CPI report just dropped 30 minutes ago — but she can't articulate WHY in probabilistic terms. OracleChain can.
+A trader stares at a Kalshi contract for "Will the Fed raise rates in June?" priced at 42 cents. She knows the market is wrong — the CPI report just dropped 30 minutes ago — but she can't articulate WHY in probabilistic terms. Sibyl can.
 
 ## Short Description (150 chars)
 Multi-source retrieval-augmented forecasting agent that anchors on market prices and routes questions to category-specific evidence pipelines.
@@ -17,13 +17,13 @@ Prediction markets like Kalshi aggregate the wisdom of thousands of informed tra
 Current AI forecasting agents miss this edge entirely. They receive a question, prompt an LLM with no external context, and return whatever the model's training data suggests. The result: performance at or below market baseline, because the model's knowledge is months stale.
 
 ### The Solution
-OracleChain is a **retrieval-augmented forecasting agent** that systematically beats prediction markets by combining three insights:
+Sibyl is a **retrieval-augmented forecasting agent** that systematically beats prediction markets by combining three insights:
 
-**1. Market Anchoring.** Instead of predicting from scratch, OracleChain starts with the market's probability as a Bayesian prior. This immediately captures the collective intelligence of thousands of traders. The agent then adjusts — not replaces — this prior based on fresh evidence.
+**1. Market Anchoring.** Instead of predicting from scratch, Sibyl starts with the market's probability as a Bayesian prior. This immediately captures the collective intelligence of thousands of traders. The agent then adjusts — not replaces — this prior based on fresh evidence.
 
-**2. Category-Specific Retrieval.** Not all questions are created equal. Sports outcomes need historical stats and injury reports. Geopolitical events need breaking news analysis. Economic questions need indicator data. OracleChain routes each question to a specialized retrieval pipeline that fetches the most relevant evidence for that domain.
+**2. Category-Specific Retrieval.** Not all questions are created equal. Sports outcomes need historical stats and injury reports. Geopolitical events need breaking news analysis. Economic questions need indicator data. Sibyl routes each question to a specialized retrieval pipeline that fetches the most relevant evidence for that domain.
 
-**3. Calibrated Ensemble.** Raw LLM probabilities are systematically miscalibrated — they're overconfident on uncertain questions and underconfident on clear ones. OracleChain applies post-hoc Platt scaling calibration trained on historical Prophet Arena data, plus cost-tiered model selection (cheap models for easy questions, expensive models for close calls).
+**3. Calibrated Ensemble.** Raw LLM probabilities are systematically miscalibrated — they're overconfident on uncertain questions and underconfident on clear ones. Sibyl applies post-hoc Platt scaling calibration trained on historical Prophet Arena data, plus cost-tiered model selection (cheap models for easy questions, expensive models for close calls).
 
 ### Architecture
 ```
@@ -43,28 +43,28 @@ Event → Category Classifier → Market Price Anchor
 Python 3.12, FastAPI, litellm, httpx, scikit-learn, diskcache
 
 ### What's Novel
-Most hackathon teams will wrap a single LLM with a "superforecaster" system prompt. OracleChain's edge comes from treating forecasting as an information retrieval problem, not a language generation problem. The LLM is the reasoning engine — but the evidence pipeline is what creates edge.
+Most hackathon teams will wrap a single LLM with a "superforecaster" system prompt. Sibyl's edge comes from treating forecasting as an information retrieval problem, not a language generation problem. The LLM is the reasoning engine — but the evidence pipeline is what creates edge.
 
 ## Demo Video Script (2-3 min)
 
-**[0:00-0:15]** Title card: "OracleChain — Retrieval-Augmented Forecasting Agent"
+**[0:00-0:15]** Title card: "Sibyl — Retrieval-Augmented Forecasting Agent"
 
 **[0:15-0:45]** Problem setup: Show the Prophet Arena leaderboard. "Even frontier LLMs only beat prediction markets by 1-4%. Most agents just prompt-and-pray. We built something different."
 
 **[0:45-1:30]** Architecture walkthrough: Mermaid diagram on screen. Walk through the pipeline: classify → anchor → retrieve → reason → calibrate. Show the category routing.
 
-**[1:30-2:15]** Live demo: Run `prophet forecast predict --local oraclechain.agent --events demo_events.json -v`. Show the verbose output for 3 different category questions — the agent fetching different evidence for each.
+**[1:30-2:15]** Live demo: Run `prophet forecast predict --local sibyl.agent --events demo_events.json -v`. Show the verbose output for 3 different category questions — the agent fetching different evidence for each.
 
 **[2:15-2:45]** Results: Show `prophet forecast evaluate` output — Brier score, edge over market, completion rate. Compare to the example agent baseline.
 
-**[2:45-3:00]** Closing: "OracleChain doesn't just predict — it retrieves evidence, reasons with context, and calibrates its confidence. That's how you beat the market."
+**[2:45-3:00]** Closing: "Sibyl doesn't just predict — it retrieves evidence, reasons with context, and calibrates its confidence. That's how you beat the market."
 
 ## Track Selection
 - **Primary**: Forecasting Track
 
 ## Screenshots Descriptions
 1. Terminal output showing category routing in action (3 different questions → 3 different retrieval strategies)
-2. Benchmark table: OracleChain vs example agent vs market baseline
+2. Benchmark table: Sibyl vs example agent vs market baseline
 3. Architecture diagram (Mermaid rendered)
 4. Cost breakdown: per-category cost analysis
 
