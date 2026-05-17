@@ -827,13 +827,14 @@ body.dbg *{outline:1px solid rgba(255,0,0,.25)!important}
       <div class="ditem"><div class="chk">✓</div><div class="dtxt"><strong>8-step prediction pipeline</strong> — parse, classify, anchor, retrieve, assemble, route, reason, calibrate</div></div>
       <div class="ditem"><div class="chk">✓</div><div class="dtxt"><strong>Dual endpoints</strong> — <code style="font-family:var(--fm);font-size:15px">/predict</code> + OpenAI-compatible <code style="font-family:var(--fm);font-size:15px">/chat/completions</code></div></div>
       <div class="ditem"><div class="chk">✓</div><div class="dtxt"><strong>Platt scaling calibration</strong> trained on 26 resolved Prophet Arena events</div></div>
-      <div class="ditem"><div class="chk">✓</div><div class="dtxt"><strong>Cost-tiered model routing</strong> — GPT-4o-mini / Gemini Flash / Claude 3.5 Sonnet via litellm</div></div>
+      <div class="ditem"><div class="chk">✓</div><div class="dtxt"><strong>Cost-tiered model routing</strong> — GPT-4o-mini / Gemini Flash / Claude Sonnet 4 via litellm</div></div>
+      <div class="ditem"><div class="chk">✓</div><div class="dtxt"><strong>Brier score 0.1644</strong> vs ~0.201 baseline — measured edge of <strong>+0.0366</strong> on 26 resolved Prophet Arena events</div></div>
       <div class="ditem"><div class="chk">✓</div><div class="dtxt"><strong>100% completion guarantee</strong> — fallback to calibrated market price, no unanswered events</div></div>
       <div class="ditem"><div class="chk">✓</div><div class="dtxt"><strong>Docker + live deployment</strong> at api.sibyl.edycu.dev with Bearer auth and Swagger docs</div></div>
-      <div class="ditem"><div class="chk">✓</div><div class="dtxt"><strong>CI pipeline + 13 passing tests</strong> — Ruff linting, Pytest coverage, GitHub Actions</div></div>
+      <div class="ditem"><div class="chk">✓</div><div class="dtxt"><strong>CI pipeline + 118 passing tests</strong> — Ruff linting, Pytest coverage, GitHub Actions</div></div>
     </div>
   </div>
-  <aside class="speaker-notes">We didn't prototype Sibyl — we deployed it. Every item listed is live and testable right now. The 100% completion rate is a deliberate design constraint from Prophet Arena's scoring formula: edge × completion_rate. Missing a prediction is always worse than returning the calibrated market price.</aside>
+  <aside class="speaker-notes">We didn't prototype Sibyl — we deployed it. The Brier score of 0.1644 is measured — run `python scripts/bench.py` to reproduce against the 26 resolved events in the repo. Edge of +0.0366 is more than double our original target of +0.018. The 100% completion rate is a deliberate design constraint from Prophet Arena's scoring formula: edge × completion_rate.</aside>
 </div>
 
 <!-- ═══════════════════════

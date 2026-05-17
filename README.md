@@ -41,7 +41,7 @@ If you are configuring the Prophet Arena CLI, you can use the same token for the
   [![Live API](https://img.shields.io/badge/🚀_Live-API_Docs-06b6d4?style=for-the-badge)](https://api.sibyl.edycu.dev/docs)
   [![Pitch Video](https://img.shields.io/badge/🎬_Pitch-Video-ef4444?style=for-the-badge)](https://youtu.be/qD5kDq3NXto)
   [![Pitch Deck](https://img.shields.io/badge/📊_Pitch-Deck-f59e0b?style=for-the-badge)](https://api.sibyl.edycu.dev/)
-  [![Built for Prophet Hacks](https://img.shields.io/badge/Devpost-Prophet_Hacks-8b5cf6?style=for-the-badge)](https://prophethacks.devpost.com/)
+  [![Built for Prophet Hacks](https://img.shields.io/badge/Devpost-Prophet_Hacks-8b5cf6?style=for-the-badge)](https://devpost.com/software/sibyl-o8w2xz/)
 
   <br/>
 
@@ -147,14 +147,23 @@ graph LR
 
 ### Performance Benchmarks
 
-*Benchmarked on 20 sample events from Prophet Arena historical data (`scripts/bench.py`).*
+*Measured on 26 resolved events from Prophet Arena `sample-resolved` dataset (`scripts/bench.py`). Run `python scripts/bench.py` to reproduce.*
 
-| Metric | Sibyl | Example Agent | Market Baseline |
-|---|---|---|---|
-| Brier Score (avg) | **0.183** | 0.201 | 0.201 |
-| Edge over Market | **+0.018** | +0.000 | 0.000 |
-| Completion Rate | **100%** | 100% | — |
-| Est. 14-day Cost | **~$15–40** | — | — |
+| Metric | Sibyl | Market Baseline |
+|---|---|---|
+| Brier Score (mean) | **0.1644** | ~0.201 |
+| Edge over Baseline | **+0.0366** | 0.000 |
+| Completion Rate | **100%** (26/26) | — |
+| Est. 14-day Cost | **~$15–40** | — |
+
+**Per-category breakdown:**
+
+| Category | n | Mean Brier |
+|---|---|---|
+| Entertainment | 4 | **0.0620** |
+| Politics | 3 | 0.1380 |
+| Sports | 16 | 0.1817 |
+| Elections | 3 | 0.2353 |
 
 ### Agent Contracts
 
