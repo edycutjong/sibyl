@@ -9,10 +9,16 @@ with p50/p95 percentile breakdown.
 
 import asyncio
 import json
+import os
 import sys
+import warnings
 from pathlib import Path
 
-import numpy as np
+# Suppress LiteLLM botocore/sagemaker noise before any import triggers it
+os.environ["LITELLM_LOG"] = "ERROR"
+warnings.filterwarnings("ignore", message=".*pre-load.*runtime response stream shape.*")
+
+import numpy as np  # noqa: E402
 
 
 async def main() -> None:

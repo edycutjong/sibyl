@@ -8,11 +8,16 @@ from __future__ import annotations
 
 import json
 import logging
+import os
+import re
 from typing import Any
 
-import litellm
+# Suppress noisy LiteLLM warnings (botocore, sagemaker)
+os.environ.setdefault("LITELLM_LOG", "ERROR")
+import litellm  # noqa: E402
+litellm.suppress_debug_info = True
 
-from sibyl.model_router import log_cost
+from sibyl.model_router import log_cost  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
@@ -83,6 +88,61 @@ def _build_user_prompt(
     return "\n".join(parts)
 
 
+def _extract_json(content: str) -> dict[str, Any] | None:
+    """Try multiple strategies to extract JSON from LLM output."""
+    # Strategy 1: Strip markdown fences
+    cleaned = content.strip()
+    cleaned = re.sub(r'^```(?:json)?\s*', '', cleaned)
+    cleaned = re.sub(r'\s*```$', '', cleaned)
+    cleaned = cleaned.strip()
+
+    # Strategy 2: Direct parse
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError:
+        pass
+
+    # Strategy 3: Find outermost { ... } with balanced braces
+    brace_start = cleaned.find('{')
+    if brace_start != -1:
+        depth = 0
+        for i in range(brace_start, len(cleaned)):
+            if cleaned[i] == '{':
+                depth += 1
+            elif cleaned[i] == '}':
+                depth -= 1
+                if depth == 0:
+                    try:
+                        return json.loads(cleaned[brace_start:i + 1])
+                    except json.JSONDecodeError:
+                        break
+
+    # Strategy 4: Greedy regex (first { to last })
+    match = re.search(r'\{.*\}', cleaned, re.DOTALL)
+    if match:
+        try:
+            return json.loads(match.group(0))
+        except json.JSONDecodeError:
+            pass
+
+    # Strategy 5: Fix truncated JSON — close open strings and braces
+    if brace_start is not None and brace_start != -1:
+        fragment = cleaned[brace_start:]
+        # Close any open string
+        if fragment.count('"') % 2 != 0:
+            fragment += '"'
+        # Close open braces
+        open_braces = fragment.count('{') - fragment.count('}')
+        fragment += '}' * max(0, open_braces)
+        # Try to extract just probabilities
+        try:
+            return json.loads(fragment)
+        except json.JSONDecodeError:
+            pass
+
+    return None
+
+
 async def reason(
     event: dict[str, Any],
     context: str,
@@ -102,67 +162,77 @@ async def reason(
     """
     user_prompt = _build_user_prompt(event, context, market_data)
 
-    try:
-        response = await litellm.acompletion(
-            model=model,
-            messages=[
+    for attempt in range(2):
+        try:
+            messages = [
                 {"role": "system", "content": _REASONING_SYSTEM_PROMPT},
                 {"role": "user", "content": user_prompt},
-            ],
-            max_tokens=2000,
-            temperature=0.2,
-        )
+            ]
 
-        content = response.choices[0].message.content.strip()
-        
-        # Strip markdown json formatting if present
-        if content.startswith("```json"):
-            content = content[7:]
-        elif content.startswith("```"):
-            content = content[3:]
-        if content.endswith("```"):
-            content = content[:-3]
-        content = content.strip()
+            # On retry, add a stricter instruction
+            if attempt > 0:
+                messages.append({
+                    "role": "user",
+                    "content": (
+                        "Your previous response was not valid JSON. "
+                        "Respond with ONLY a raw JSON object — no markdown, no explanation, no code fences. "
+                        "Start your response with { and end with }."
+                    ),
+                })
+                logger.info("Retry %d with stricter JSON prompt", attempt)
 
-        # Track cost
-        usage = response.usage
-        if usage:
-            log_cost(model, usage.prompt_tokens, usage.completion_tokens)
+            response = await litellm.acompletion(
+                model=model,
+                messages=messages,
+                max_tokens=4096,
+                temperature=0.2,
+            )
 
-        # Robust JSON extraction
-        import re
-        # Find the first '{' and the last '}'
-        match = re.search(r'\{.*\}', content, re.DOTALL)
-        if match:
-            json_str = match.group(0)
-        else:
-            json_str = content
+            content = response.choices[0].message.content.strip()
 
-        # Parse JSON response
-        result = json.loads(json_str)
+            # Track cost
+            usage = response.usage
+            if usage:
+                log_cost(model, usage.prompt_tokens, usage.completion_tokens)
 
-        # Validate and normalize probabilities
-        probs = result.get("probabilities", {})
-        if isinstance(probs, list):
-            # Handle list format: [{"market": "A", "probability": 0.68}, ...]
-            probs = {item["market"]: item["probability"] for item in probs}
+            # Extract JSON with multiple strategies
+            result = _extract_json(content)
 
-        probs = _normalize_probabilities(probs, event.get("outcomes", ["Yes", "No"]))
+            if result is None:
+                if attempt == 0:
+                    logger.warning("JSON extraction failed (attempt 1), retrying...")
+                    logger.debug("Raw content: %s", content[:500])
+                    continue
+                else:
+                    logger.error("JSON extraction failed after retry")
+                    logger.error("Raw content: %s", content[:500])
+                    return _fallback_prediction(event)
 
-        return {
-            "probabilities": probs,
-            "rationale": result.get("rationale", "No rationale provided."),
-            "confidence": result.get("confidence", "medium"),
-            "model": model,
-        }
+            # Validate and normalize probabilities
+            probs = result.get("probabilities", {})
+            if isinstance(probs, list):
+                probs = {item["market"]: item["probability"] for item in probs}
 
-    except json.JSONDecodeError as _err:
-        logger.error("Failed to parse LLM JSON response: %s", _err)
-        logger.error("Raw content: %s", content)
-        return _fallback_prediction(event)
-    except Exception as _err:
-        logger.error("LLM reasoning failed: %s", _err)
-        return _fallback_prediction(event)
+            probs = _normalize_probabilities(probs, event.get("outcomes", ["Yes", "No"]))
+
+            return {
+                "probabilities": probs,
+                "rationale": result.get("rationale", "No rationale provided."),
+                "confidence": result.get("confidence", "medium"),
+                "model": model,
+            }
+
+        except json.JSONDecodeError as _err:
+            if attempt == 0:
+                logger.warning("JSON parse error (attempt 1): %s", _err)
+                continue
+            logger.error("Failed to parse LLM JSON after retry: %s", _err)
+            return _fallback_prediction(event)
+        except Exception as _err:
+            logger.error("LLM reasoning failed: %s", _err)
+            return _fallback_prediction(event)
+
+    return _fallback_prediction(event)  # pragma: no cover
 
 
 def _normalize_probabilities(
