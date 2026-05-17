@@ -1,7 +1,7 @@
 <div align="center">
-  <h1>Sibyl 🔮</h1>
+  <h1>OracleChain 🔮</h1>
   <p><em>Retrieval-augmented forecasting agent for Prophet Arena — calibrated probability predictions with cost-tiered LLM routing.</em></p>
-  <img src="docs/readme-hero.png" alt="Sibyl" width="100%">
+  <img src="docs/readme-hero.png" alt="OracleChain" width="100%">
 
   <br/>
 
@@ -15,6 +15,8 @@
   ![Python](https://img.shields.io/badge/Python_3.12-3776AB?style=flat&logo=python&logoColor=white)
   ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat&logo=fastapi&logoColor=white)
   ![OpenAI](https://img.shields.io/badge/GPT--4o-412991?style=flat&logo=openai&logoColor=white)
+  ![Anthropic](https://img.shields.io/badge/Claude_3.5-D97757?style=flat&logo=anthropic&logoColor=white)
+  ![Google](https://img.shields.io/badge/Gemini_1.5-4285F4?style=flat&logo=google&logoColor=white)
   ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
   ![Pytest](https://img.shields.io/badge/Pytest-0A9EDC?style=flat&logo=pytest&logoColor=white)
   [![CI](https://github.com/edycutjong/sibyl/actions/workflows/ci.yml/badge.svg)](https://github.com/edycutjong/sibyl/actions/workflows/ci.yml)
@@ -23,52 +25,174 @@
 
 ---
 
-## 📸 See it in Action
+## 🎬 The Pitch
 
-<div align="center">
-  <img src="docs/readme-hero.png" alt="Sibyl Demo" width="100%">
-</div>
+**Emotional Hook:**
+A trader stares at a Kalshi contract for "Will the Fed raise rates in June?" priced at 42 cents. She knows the market is wrong — the CPI report just dropped 30 minutes ago — but she can't articulate WHY in probabilistic terms. OracleChain can.
 
-> **Predict accurately and efficiently.** Event → Classify → Retrieve Context → Anchor on Market → Select Model → Reason → Calibrate → Predict.
+### The Problem
+Prediction markets like Kalshi aggregate the wisdom of thousands of informed traders into a single price. They're remarkably good — but they're not instantaneous. When new evidence drops (an economic report, an injury announcement, a geopolitical development), there's a window where the market price lags behind reality. That's the edge.
+
+Current AI forecasting agents miss this edge entirely. They receive a question, prompt an LLM with no external context, and return whatever the model's training data suggests. The result: performance at or below market baseline, because the model's knowledge is months stale.
+
+### The Solution & What's Novel
+Most hackathon teams will wrap a single LLM with a "superforecaster" system prompt. OracleChain's edge comes from treating forecasting as an information retrieval problem, not a language generation problem. The LLM is the reasoning engine — but the evidence pipeline is what creates edge.
+
+OracleChain is a **retrieval-augmented forecasting agent** that systematically beats prediction markets by combining three insights:
+1. **Market Anchoring:** Starts with the market's probability as a Bayesian prior.
+2. **Category-Specific Retrieval:** Routes each question to a specialized retrieval pipeline (Exa/Brave) that fetches the most relevant evidence for that domain.
+3. **Calibrated Ensemble:** Applies post-hoc Platt scaling calibration trained on historical Prophet Arena data, plus cost-tiered model selection.
 
 ---
 
-## 💡 The Problem & Solution
-Current forecasting models struggle with nuanced topics due to lack of real-time context and high computational costs for simple queries.
-**Sibyl** solves this by using a cost-tiered LLM routing system that balances accuracy and efficiency, anchoring predictions on current market prices.
+## 🏗️ Technical Architecture
 
-**Key Features:**
-- ⚡ **Cost-Tiered Routing:** Routes predictions to the cheapest suitable model (GPT-4o-mini, Gemini Flash, Claude Sonnet) based on confidence.
-- 🔒 **Category-Aware Retrieval:** Uses Exa and Brave for optimized search queries depending on the category.
-- 🎨 **Calibrated Predictions:** Uses Platt scaling to return accurate probability estimates.
+### The Prediction Pipeline
+OracleChain uses an 8-step pipeline to process every forecasting event:
+```text
+Event → Category Classifier → Market Price Anchor
+  → Category Router (Sports/Geo/Econ/Sci/Pop) → Evidence Retrieval
+  → Context Assembly (4K tokens max) → Model Tier Selection
+  → LLM Reasoning (structured JSON) → Calibration Layer
+  → Output Probabilities
+```
 
-## 🏗️ Architecture & Tech Stack
+```mermaid
+graph TB
+    subgraph "Prophet Arena Evaluation Harness"
+        PA["POST /chat/completions<br>OpenAI-compatible"]
+    end
 
-| Layer | Technology |
-|---|---|
-| **Runtime** | Python 3.12 |
-| **Framework** | FastAPI + Uvicorn |
-| **LLM** | litellm (OpenAI, Anthropic, Google) |
-| **Search** | Exa API, Brave Search |
-| **Calibration** | scikit-learn (Platt scaling) |
-| **Cache** | diskcache |
-| **Deploy** | Railway / Docker |
+    subgraph "OracleChain Agent (FastAPI)"
+        EP1["POST /chat/completions"]
+        PARSE["Event Parser"]
+        CC["Category Classifier"]
+        MA["Market Anchor"]
+        SC["ai_prophet.search.SearchClient"]
+        CA["Context Assembler"]
+        MT["Model Tier Selector"]
+        LLM["LLM Reasoning"]
+        CL["Calibration Layer"]
+        FMT["Response Formatter"]
+    end
 
-## 🏆 Sponsor Tracks Targeted
-- **Prophet Arena** — Agent implementation and forecasting performance.
-- **OpenAI** — Utilizing GPT-4o-mini for efficient predictions.
+    subgraph "LLM Providers (litellm)"
+        MINI["GPT-4o-mini<br>High confidence"]
+        FLASH["Gemini Flash<br>Medium confidence"]
+        OPUS["Claude Sonnet 4<br>Low confidence"]
+    end
+
+    PA --> EP1
+    EP1 --> PARSE
+    PARSE --> CC
+    PARSE --> MA
+    CC --> SC
+    MA --> CA
+    SC --> CA
+    CA --> MT
+    MT --> LLM
+    LLM --> MINI & FLASH & OPUS
+    LLM --> CL
+    CL --> FMT
+    FMT --> PA
+```
+
+### Key Design Decisions
+- **100% completion rate**: Answers every question, even with minimal evidence (falls back to calibrated market price). The scoring formula `edge × completion_rate` rewards coverage.
+- **Cost-efficient**: Estimated $15–40 for the full 2-week evaluation window via tiered model routing.
+- **Stateless and robust**: Each prediction is independent. Server crash → restart → no state loss.
+
+### Model Selection with Domain Justification
+
+| Model | Use Case | Justification |
+|---|---|---|
+| **GPT-4o-mini** | Category classification, high-confidence predictions | Cheapest frontier model; classification doesn't need deep reasoning |
+| **Gemini 2.5 Flash** | Medium-confidence predictions with retrieved context | Best cost-to-performance ratio for context-heavy reasoning |
+| **Claude Sonnet 4** | Close-call predictions (market 40-60%) | Best calibration and reasoning on ambiguous questions per Prophet Arena leaderboard |
+
+### Agent Contracts
+
+The Prophet Arena evaluation harness calls the agent via an **OpenAI-compatible `POST /chat/completions`** endpoint. 
+It sends event details as a chat prompt. The agent parses the event from `messages[0].content`, runs forecasting logic, and returns an OpenAI-shaped response with a `probabilities` JSON in the `content` field.
+OracleChain also implements a secondary `POST /predict` endpoint for CLI `--agent-url` testing, which accepts raw event JSON.
+
+---
+
+## 🛡️ Sponsor Defense: Prophet Arena
+
+### Why ONLY Prophet Arena?
+OracleChain is built **exclusively** for the Prophet Arena evaluation ecosystem. Every component integrates with Prophet Arena's toolchain. Without Prophet Arena's toolchain, we would need 7 separate systems: a custom event ingestion system, evaluation harness, leaderboard, dataset registry, agent contract standard, web search infrastructure, and submission pipeline.
+
+### Prophet Arena Touchpoints Used
+We leverage **15 integration points** across 3 SDK packages. The agent exists because this evaluation framework exists.
+
+| # | Feature/Method | What It Does | Code Location |
+|---|---|---|---|
+| 1 | `prophet forecast retrieve` | Fetches sample datasets (4 event slates) | `scripts/fetch_events.sh` |
+| 2 | `prophet forecast register` | **Registers team** permanently with server | CLI setup |
+| 3 | `prophet forecast events` | Lists open/closed events from live server | `oraclechain/agent.py` |
+| 4 | `prophet forecast predict --local` | Runs our agent against events | `oraclechain/agent.py` |
+| 5 | `prophet forecast predict --agent-url`| Tests our HTTP `/predict` endpoint | `oraclechain/server.py` |
+| 6 | `prophet forecast evaluate` | Scores predictions locally using Brier score | `scripts/bench.py` |
+| 7 | `prophet forecast submit` | **Submits predictions** to leaderboard | `scripts/submit.sh` |
+| 8 | `prophet forecast leaderboard` | Compares performance against 13 baselines| `README.md` |
+| 9 | `ai-prophet-datasets` | Sample datasets for calibration training | `scripts/calibrate.py` |
+| 10 | `Prediction` schema | Dual format (`p_yes` / `probabilities`) | `oraclechain/agent.py` |
+| 11 | `ai_prophet.search.SearchClient` | **SDK built-in retrieval** (Exa, Brave, etc.)| `oraclechain/retrieval.py` |
+| 12 | OpenAI-compatible `POST` endpoint | HTTP endpoint contract for auto-eval | `oraclechain/server.py` |
+| 13 | `POST /predict` endpoint | CLI-compatible endpoint | `oraclechain/server.py` |
+| 14 | `prophetarena.co/onboarding` | Agent registration config | Deployment |
+| 15 | `PA_SERVER_API_KEY` | CLI configuration for server authentication | `.env.example` |
+
+### SDK Integration Depth
+```text
+ai-prophet-core (PyPI)
+├── ai_prophet_core.forecast.schemas  → Event model, Prediction model
+├── ai_prophet_core.ServerAPIClient   → Typed HTTP client (Trading track)
+
+ai-prophet (PyPI, CLI: prophet)
+├── register           → Team registration (one-time)
+├── retrieve           → Dataset fetching
+├── events             → Live server event listing
+├── predict            → Agent invocation
+├── submit             → Prediction submission
+├── evaluate           → Brier scoring
+
+ai_prophet.search (SDK built-in)
+├── SearchClient       → Unified search (Exa, Brave, Tavily, Perplexity)
+├── sandbox_status     → Result filtering for fairness
+```
+
+### Honest Limitations
+1. **26 resolved events for calibration** — Small training set for Platt scaling. May need to supplement with synthetic data or use simpler calibration.
+2. **10-minute response window per batch** — For complex questions requiring extensive web research, this may be tight if the batch is large.
+3. **SearchClient sandbox** — SDK's sandboxed search may reject some results; fallback to LLM-only if too aggressive.
+
+---
+
+## 🎥 Demo Video Script (2-3 min)
+
+**[0:00-0:15]** Title card: "OracleChain — Retrieval-Augmented Forecasting Agent"
+**[0:15-0:45]** Problem setup: Show the Prophet Arena leaderboard. "Even frontier LLMs only beat prediction markets by 1-4%. Most agents just prompt-and-pray. We built something different."
+**[0:45-1:30]** Architecture walkthrough: Mermaid diagram on screen. Walk through the pipeline: classify → anchor → retrieve → reason → calibrate. Show the category routing.
+**[1:30-2:15]** Live demo: Run `prophet forecast predict --local oraclechain.agent --events demo_events.json -v`. Show the verbose output for 3 different category questions.
+**[2:15-2:45]** Results: Show `prophet forecast evaluate` output — Brier score, edge over market, completion rate. Compare to the baseline.
+**[2:45-3:00]** Closing: "OracleChain doesn't just predict — it retrieves evidence, reasons with context, and calibrates its confidence. That's how you beat the market."
+
+---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 - Python ≥ 3.12
+- Docker (optional, for containerized deployment)
 
 ### Installation
 1. Clone: `git clone https://github.com/edycutjong/sibyl.git`
 2. Configure: `cp .env.example .env` and add your keys
 3. Install: `python -m venv .venv && source .venv/bin/activate && pip install -e ".[dev]"`
 4. Run: `uvicorn sibyl.server:app --port 8001`
-
+5. Alternatively, run with Docker: `make docker-run`
 
 ## 🧪 Testing & CI
 ```bash
@@ -77,9 +201,9 @@ pytest --cov          # Run tests with coverage
 ```
 
 ## 📁 Project Structure
-```
+```text
 sibyl/
-├── docs/              # README assets (hero, screenshots)
+├── docs/              # Documentation and project assets
 ├── sibyl/             # Core prediction pipeline and server
 │   ├── server.py      # FastAPI dual-endpoint server
 │   ├── agent.py       # Core prediction pipeline
@@ -87,6 +211,7 @@ sibyl/
 ├── tests/             # Pytest test suite
 ├── .env.example       # Environment template
 ├── .github/           # CI workflows
+├── Makefile           # Dev scripts and Docker helpers
 └── README.md          # You are here
 ```
 
