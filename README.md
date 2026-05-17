@@ -174,17 +174,6 @@ ai_prophet.search (SDK built-in)
 
 ---
 
-## 🎥 Demo Video Script (2-3 min)
-
-**[0:00-0:15]** Title card: "Sibyl — Retrieval-Augmented Forecasting Agent"
-**[0:15-0:45]** Problem setup: Show the Prophet Arena leaderboard. "Even frontier LLMs only beat prediction markets by 1-4%. Most agents just prompt-and-pray. We built something different."
-**[0:45-1:30]** Architecture walkthrough: Mermaid diagram on screen. Walk through the pipeline: classify → anchor → retrieve → reason → calibrate. Show the category routing.
-**[1:30-2:15]** Live demo: Run `prophet forecast predict --local sibyl.agent --events demo_events.json -v`. Show the verbose output for 3 different category questions.
-**[2:15-2:45]** Results: Show `prophet forecast evaluate` output — Brier score, edge over market, completion rate. Compare to the baseline.
-**[2:45-3:00]** Closing: "Sibyl doesn't just predict — it retrieves evidence, reasons with context, and calibrates its confidence. That's how you beat the market."
-
----
-
 ## 📝 Hackathon Submission
 
 > 📖 **Read more:** View our complete Devpost submission write-up in [SUBMISSION.md](docs/SUBMISSION.md).
