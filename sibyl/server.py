@@ -15,7 +15,9 @@ from contextlib import asynccontextmanager
 from typing import Any
 
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from sibyl.agent import get_prediction_stats, predict, startup
@@ -87,6 +89,14 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+
+# Mount public directory for static assets
+app.mount("/public", StaticFiles(directory="public"), name="public")
+
+@app.get("/")
+async def root():
+    """Serve the static pitch deck landing page."""
+    return FileResponse("public/index.html")
 
 
 

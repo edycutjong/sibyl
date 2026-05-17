@@ -61,7 +61,6 @@ def _extract_prices(
     yes_price = market_data.get("yes_price")
     if yes_price is None:
         yes_price = market_data.get("last_price")
-    no_price = market_data.get("no_price")
 
     if yes_price is not None:
         # Kalshi prices are in cents (1-99) → convert to probability

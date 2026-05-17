@@ -3,21 +3,18 @@ FROM python:3.12-slim
 WORKDIR /app
 
 # Install dependencies
-COPY pyproject.toml .
+COPY pyproject.toml README.md ./
 RUN pip install --no-cache-dir .
 
 # Copy source
 COPY sibyl/ sibyl/
 COPY scripts/ scripts/
+COPY public/ public/
 
 
 # Port
 ENV PORT=8001
 EXPOSE ${PORT}
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s \
-  CMD python -c "import httpx; httpx.get('http://localhost:${PORT}/health').raise_for_status()"
-
 # Run
-CMD ["uvicorn", "sibyl.server:app", "--host", "0.0.0.0", "--port", "8001", "--log-level", "info"]
+CMD uvicorn sibyl.server:app --host 0.0.0.0 --port ${PORT:-8001} --log-level info

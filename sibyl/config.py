@@ -10,6 +10,7 @@ from pydantic_settings import BaseSettings
 # Load .env into os.environ so third-party libraries (like litellm) can access them
 load_dotenv()
 
+
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
@@ -35,7 +36,7 @@ class Settings(BaseSettings):
 
     # ── Model Selection Defaults ───────────────────────────────
     model_high_confidence: str = "gpt-4o-mini"
-    model_medium_confidence: str = "gemini/gemini-3.1-flash"
+    model_medium_confidence: str = "gpt-4o-mini"
     model_low_confidence: str = "claude-sonnet-4-20250514"
     model_classifier: str = "gpt-4o-mini"
 
