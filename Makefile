@@ -1,14 +1,26 @@
-.PHONY: help test docker-build docker-run docker-stop
+.PHONY: help dev calibrate bench test docker-build docker-run docker-stop
 
 .DEFAULT_GOAL := help
 
 help:
 	@echo "Sibyl Makefile"
 	@echo "Available commands:"
+	@echo "  dev            - Run the local development server (uvicorn)"
+	@echo "  calibrate      - Train the Platt scaling calibration model"
+	@echo "  bench          - Run benchmark evaluation for Brier score"
 	@echo "  test           - Run pytest with coverage"
 	@echo "  docker-build   - Build the Docker image"
 	@echo "  docker-run     - Run the Docker container on port 8001"
 	@echo "  docker-stop    - Stop the Docker container"
+
+dev:
+	bash scripts/run_server.sh
+
+calibrate:
+	python scripts/calibrate.py
+
+bench:
+	python scripts/bench.py
 
 test:
 	pytest --cov=sibyl
