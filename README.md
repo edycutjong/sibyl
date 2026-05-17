@@ -1,182 +1,48 @@
-# 🔮 Sibyl
+<div align="center">
+  <h1>Sibyl 🔮</h1>
+  <p><em>Retrieval-augmented forecasting agent for Prophet Arena — calibrated probability predictions with cost-tiered LLM routing.</em></p>
+  <img src="docs/readme-hero.png" alt="Sibyl" width="100%">
 
-**Retrieval-augmented forecasting agent for Prophet Arena** — calibrated probability predictions with cost-tiered LLM routing.
+  <br/>
 
-> *Named after the ancient Greek prophetesses who channeled divine knowledge into actionable predictions.*
+  [![Live Demo](https://img.shields.io/badge/🚀_Live-Demo-06b6d4?style=for-the-badge)](https://github.com/edycutjong/sibyl)
+  [![Pitch Video](https://img.shields.io/badge/🎬_Pitch-Video-ef4444?style=for-the-badge)](https://youtu.be/your-video)
+  [![Pitch Deck](https://img.shields.io/badge/📊_Pitch-Deck-f59e0b?style=for-the-badge)](https://github.com/edycutjong/sibyl/pitch)
+  [![Built for Prophet Hacks](https://img.shields.io/badge/Devpost-Prophet_Hacks-8b5cf6?style=for-the-badge)](https://prophethacks.devpost.com/)
+
+  <br/>
+
+  ![Python](https://img.shields.io/badge/Python_3.12-3776AB?style=flat&logo=python&logoColor=white)
+  ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat&logo=fastapi&logoColor=white)
+  ![OpenAI](https://img.shields.io/badge/GPT--4o-412991?style=flat&logo=openai&logoColor=white)
+  ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
+  ![Pytest](https://img.shields.io/badge/Pytest-0A9EDC?style=flat&logo=pytest&logoColor=white)
+  [![CI](https://github.com/edycutjong/sibyl/actions/workflows/ci.yml/badge.svg)](https://github.com/edycutjong/sibyl/actions/workflows/ci.yml)
+
+</div>
 
 ---
 
-## What It Does
+## 📸 See it in Action
 
-Sibyl is an AI forecasting agent that receives prediction market questions and returns **calibrated probability estimates**. It combines domain-specific web retrieval, market price anchoring, and multi-model LLM reasoning to outperform naive forecasting approaches.
+<div align="center">
+  <img src="docs/readme-hero.png" alt="Sibyl Demo" width="100%">
+</div>
 
-### Core Pipeline
+> **Predict accurately and efficiently.** Event → Classify → Retrieve Context → Anchor on Market → Select Model → Reason → Calibrate → Predict.
 
-```
-Event → Classify → Retrieve Context → Anchor on Market → Select Model → Reason → Calibrate → Predict
-```
+---
 
-```mermaid
-graph LR
-    A[Event] --> B[Category Classifier]
-    B --> C[Web Search<br>Exa / Brave]
-    C --> D[Context Assembly]
-    D --> E[Model Router]
-    E --> F{Confidence?}
-    F -->|High| G[GPT-4o-mini<br>$0.0001/q]
-    F -->|Medium| H[Gemini Flash<br>$0.001/q]
-    F -->|Low| I[Claude Sonnet 4<br>$0.005/q]
-    G & H & I --> J[Platt Calibration]
-    J --> K[Prediction<br>p_yes or probabilities]
-```
+## 💡 The Problem & Solution
+Current forecasting models struggle with nuanced topics due to lack of real-time context and high computational costs for simple queries.
+**Sibyl** solves this by using a cost-tiered LLM routing system that balances accuracy and efficiency, anchoring predictions on current market prices.
 
-## Quick Start
+**Key Features:**
+- ⚡ **Cost-Tiered Routing:** Routes predictions to the cheapest suitable model (GPT-4o-mini, Gemini Flash, Claude Sonnet) based on confidence.
+- 🔒 **Category-Aware Retrieval:** Uses Exa and Brave for optimized search queries depending on the category.
+- 🎨 **Calibrated Predictions:** Uses Platt scaling to return accurate probability estimates.
 
-```bash
-# 1. Clone & install
-git clone https://github.com/<your-username>/sibyl.git && cd sibyl
-python -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev]"
-
-# 2. Configure
-cp .env.example .env
-# Edit .env with your API keys
-
-# 3. Run
-uvicorn sibyl.server:app --port 8001
-```
-
-## API Endpoints
-
-| Endpoint | Method | Description |
-|---|---|---|
-| `/chat/completions` | POST | OpenAI-compatible — Prophet Arena auto-eval |
-| `/predict` | POST | CLI-compatible — `prophet forecast predict --agent-url` |
-| `/health` | GET | Uptime monitoring |
-| `/stats` | GET | Cost and performance metrics |
-
-### Example: `/predict`
-
-```bash
-curl -X POST http://localhost:8001/predict \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{
-    "title": "Will the Fed raise rates in June 2026?",
-    "outcomes": ["Yes", "No"],
-    "category": "Economics"
-  }'
-```
-
-Response:
-```json
-{
-  "p_yes": 0.38,
-  "rationale": "Recent CPI data shows cooling inflation, and FOMC minutes suggest a hold. Market consensus is 62% probability of no change."
-}
-```
-
-## Architecture
-
-### Cost-Tiered Model Selection
-
-The agent routes each prediction to the cheapest suitable model:
-
-| Confidence Level | Model | Cost | Use Case |
-|---|---|---|---|
-| **High** (>85%) | GPT-4o-mini | ~$0.0001/q | Clear consensus questions |
-| **Medium** (15-85%) | Gemini 2.5 Flash | ~$0.001/q | Standard predictions |
-| **Low** (40-60%) | Claude Sonnet 4 | ~$0.005/q | Close calls, complex reasoning |
-
-**Estimated 2-week cost**: <$25 (well within $40 budget)
-
-### Response Formats
-
-Sibyl supports both Prophet Arena response formats:
-
-**Binary events** (2 outcomes):
-```json
-{"p_yes": 0.65, "rationale": "..."}
-```
-
-**Multi-outcome events**:
-```json
-{"probabilities": [{"market": "A", "probability": 0.45}, {"market": "B", "probability": 0.35}, {"market": "C", "probability": 0.20}], "rationale": "..."}
-```
-
-### Category-Aware Retrieval
-
-Events are classified into 6 categories, each with optimized search queries:
-
-- **Sports** → Stats, odds, injury reports
-- **Geopolitics** → News analysis, expert opinion
-- **Economics** → Economic indicators, Fed signals
-- **Science/Tech** → Research breakthroughs, announcements
-- **Pop Culture** → Trends, social media sentiment
-- **Other** → General analysis
-
-## Project Structure
-
-```
-sibyl/
-├── pyproject.toml
-├── Dockerfile
-├── .env.example
-├── sibyl/
-│   ├── server.py          # FastAPI dual-endpoint server
-│   ├── agent.py           # Core prediction pipeline
-│   ├── parser.py          # Event extraction from prompts
-│   ├── classifier.py      # Category classification
-│   ├── retrieval.py       # Web search (Exa/Brave)
-│   ├── anchor.py          # Market price lookup
-│   ├── reasoning.py       # LLM reasoning engine
-│   ├── model_router.py    # Cost-tiered model selection
-│   ├── calibration.py     # Platt scaling
-│   ├── cache.py           # Disk-based response cache
-│   └── config.py          # Environment settings
-├── scripts/
-│   ├── bench.py           # Brier score benchmarking
-│   └── run_server.sh      # Launch script
-└── tests/
-    ├── test_server.py     # Endpoint tests
-    ├── test_agent.py      # Pipeline tests
-    ├── test_parser.py     # Parser tests
-    └── test_classifier.py # Classifier tests
-```
-
-## Deployment
-
-### Railway (Recommended)
-
-```bash
-# Deploy
-railway up
-
-# Set environment variables
-railway variables set OPENAI_API_KEY=sk-... EXA_API_KEY=... BEARER_TOKEN=...
-
-# Generate domain
-railway domain
-```
-
-### Docker
-
-```bash
-docker build -t sibyl .
-docker run -p 8001:8001 --env-file .env sibyl
-```
-
-## Testing
-
-```bash
-# Run all tests
-pytest -v
-
-# With coverage
-pytest --cov=sibyl --cov-report=term-missing
-```
-
-## Tech Stack
+## 🏗️ Architecture & Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -188,10 +54,44 @@ pytest --cov=sibyl --cov-report=term-missing
 | **Cache** | diskcache |
 | **Deploy** | Railway / Docker |
 
-## License
+## 🏆 Sponsor Tracks Targeted
+- **Prophet Arena** — Agent implementation and forecasting performance.
+- **OpenAI** — Utilizing GPT-4o-mini for efficient predictions.
 
-MIT — see [LICENSE](LICENSE).
+## 🚀 Getting Started
 
----
+### Prerequisites
+- Python ≥ 3.12
 
-*Built for [Prophet Hacks 2026](https://prophethacks.devpost.com/) — Forecasting Track*
+### Installation
+1. Clone: `git clone https://github.com/edycutjong/sibyl.git`
+2. Configure: `cp .env.example .env` and add your keys
+3. Install: `python -m venv .venv && source .venv/bin/activate && pip install -e ".[dev]"`
+4. Run: `uvicorn sibyl.server:app --port 8001`
+
+
+## 🧪 Testing & CI
+```bash
+ruff check .          # Linting
+pytest --cov          # Run tests with coverage
+```
+
+## 📁 Project Structure
+```
+sibyl/
+├── docs/              # README assets (hero, screenshots)
+├── sibyl/             # Core prediction pipeline and server
+│   ├── server.py      # FastAPI dual-endpoint server
+│   ├── agent.py       # Core prediction pipeline
+│   └── model_router.py# Cost-tiered model selection
+├── tests/             # Pytest test suite
+├── .env.example       # Environment template
+├── .github/           # CI workflows
+└── README.md          # You are here
+```
+
+## 📄 License
+[MIT](LICENSE) © 2026 Edy Cu
+
+## 🙏 Acknowledgments
+Built for Prophet Hacks. Thank you to the sponsors for the APIs and tools.
