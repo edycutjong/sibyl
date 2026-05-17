@@ -15,6 +15,7 @@ from typing import Any
 # Suppress noisy LiteLLM warnings (botocore, sagemaker)
 os.environ.setdefault("LITELLM_LOG", "ERROR")
 import litellm  # noqa: E402
+
 litellm.suppress_debug_info = True
 
 from sibyl.model_router import log_cost  # noqa: E402
@@ -80,61 +81,72 @@ def _build_user_prompt(
     # Retrieved context
     parts.append(f"\n## Retrieved Context\n{context}")
 
-    parts.append(
-        "\n## Task\nEstimate the probability of each outcome. "
-        "Return ONLY a JSON object with 'probabilities', 'rationale', and 'confidence'."
-    )
+    parts.append("\n## Task\nEstimate the probability of each outcome. Return ONLY a JSON object with 'probabilities', 'rationale', and 'confidence'.")
 
     return "\n".join(parts)
 
 
 def _extract_json(content: str) -> dict[str, Any] | None:
     """Try multiple strategies to extract JSON from LLM output."""
-    # Strategy 1: Strip markdown fences
     cleaned = content.strip()
-    cleaned = re.sub(r'^```(?:json)?\s*', '', cleaned)
-    cleaned = re.sub(r'\s*```$', '', cleaned)
-    cleaned = cleaned.strip()
+
+    # Strategy 1: Extract from markdown code blocks if present anywhere
+    match = re.search(r"```(?:json)?\s*(.*?)\s*```", cleaned, re.DOTALL)
+    if match:
+        try:
+            return json.loads(match.group(1))
+        except json.JSONDecodeError:
+            pass
+
+    # Strategy 1b: Strip markdown fences if they are at the edges
+    stripped = re.sub(r"^```(?:json)?\s*", "", cleaned)
+    stripped = re.sub(r"\s*```$", "", stripped)
+    stripped = stripped.strip()
 
     # Strategy 2: Direct parse
     try:
-        return json.loads(cleaned)
+        return json.loads(stripped)
     except json.JSONDecodeError:
         pass
 
-    # Strategy 3: Find outermost { ... } with balanced braces
-    brace_start = cleaned.find('{')
-    if brace_start != -1:
+    # Strategy 3: Find outermost { ... } with balanced braces, searching all {
+    start_idx = 0
+    while True:
+        brace_start = stripped.find("{", start_idx)
+        if brace_start == -1:
+            break
+
         depth = 0
-        for i in range(brace_start, len(cleaned)):
-            if cleaned[i] == '{':
+        for i in range(brace_start, len(stripped)):
+            if stripped[i] == "{":
                 depth += 1
-            elif cleaned[i] == '}':
+            elif stripped[i] == "}":
                 depth -= 1
                 if depth == 0:
                     try:
-                        return json.loads(cleaned[brace_start:i + 1])
+                        return json.loads(stripped[brace_start : i + 1])
                     except json.JSONDecodeError:
-                        break
+                        break  # Not valid JSON at this brace_start, break inner loop
+        start_idx = brace_start + 1
 
     # Strategy 4: Greedy regex (first { to last })
-    match = re.search(r'\{.*\}', cleaned, re.DOTALL)
-    if match:
+    first_brace = stripped.find("{")
+    last_brace = stripped.rfind("}")
+    if first_brace != -1 and last_brace != -1 and last_brace > first_brace:
         try:
-            return json.loads(match.group(0))
+            return json.loads(stripped[first_brace : last_brace + 1])
         except json.JSONDecodeError:
             pass
 
     # Strategy 5: Fix truncated JSON — close open strings and braces
-    if brace_start is not None and brace_start != -1:
-        fragment = cleaned[brace_start:]
+    if first_brace != -1:
+        fragment = stripped[first_brace:]
         # Close any open string
         if fragment.count('"') % 2 != 0:
             fragment += '"'
         # Close open braces
-        open_braces = fragment.count('{') - fragment.count('}')
-        fragment += '}' * max(0, open_braces)
-        # Try to extract just probabilities
+        open_braces = fragment.count("{") - fragment.count("}")
+        fragment += "}" * max(0, open_braces)
         try:
             return json.loads(fragment)
         except json.JSONDecodeError:
@@ -171,14 +183,16 @@ async def reason(
 
             # On retry, add a stricter instruction
             if attempt > 0:
-                messages.append({
-                    "role": "user",
-                    "content": (
-                        "Your previous response was not valid JSON. "
-                        "Respond with ONLY a raw JSON object — no markdown, no explanation, no code fences. "
-                        "Start your response with { and end with }."
-                    ),
-                })
+                messages.append(
+                    {
+                        "role": "user",
+                        "content": (
+                            "Your previous response was not valid JSON. "
+                            "Respond with ONLY a raw JSON object — no markdown, no explanation, no code fences. "
+                            "Start your response with { and end with }."
+                        ),
+                    }
+                )
                 logger.info("Retry %d with stricter JSON prompt", attempt)
 
             response = await litellm.acompletion(
