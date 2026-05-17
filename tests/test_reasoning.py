@@ -117,6 +117,22 @@ async def test_reason_json_error(mocker, caplog):
 
 
 @pytest.mark.asyncio
+async def test_reason_markdown_strip(mocker):
+    mock_response = MagicMock()
+    mock_message = MagicMock()
+    # Test stripping ``` without json
+    mock_message.content = '```\n{"probabilities": {"Yes": 0.8, "No": 0.2}}\n```'
+    mock_response.choices = [MagicMock(message=mock_message)]
+    mock_response.usage = None
+
+    mocker.patch("sibyl.reasoning.litellm.acompletion", return_value=mock_response)
+
+    result = await reason({"title": "test"}, "context", {"found": False}, "test-model")
+    assert result["probabilities"] == {"Yes": 0.8, "No": 0.2}
+
+
+
+@pytest.mark.asyncio
 async def test_reason_exception(mocker, caplog):
     mocker.patch("sibyl.reasoning.litellm.acompletion", side_effect=Exception("API Error"))
 

@@ -109,20 +109,37 @@ async def reason(
                 {"role": "system", "content": _REASONING_SYSTEM_PROMPT},
                 {"role": "user", "content": user_prompt},
             ],
-            max_tokens=500,
+            max_tokens=2000,
             temperature=0.2,
-            response_format={"type": "json_object"},
         )
 
         content = response.choices[0].message.content.strip()
+        
+        # Strip markdown json formatting if present
+        if content.startswith("```json"):
+            content = content[7:]
+        elif content.startswith("```"):
+            content = content[3:]
+        if content.endswith("```"):
+            content = content[:-3]
+        content = content.strip()
 
         # Track cost
         usage = response.usage
         if usage:
             log_cost(model, usage.prompt_tokens, usage.completion_tokens)
 
+        # Robust JSON extraction
+        import re
+        # Find the first '{' and the last '}'
+        match = re.search(r'\{.*\}', content, re.DOTALL)
+        if match:
+            json_str = match.group(0)
+        else:
+            json_str = content
+
         # Parse JSON response
-        result = json.loads(content)
+        result = json.loads(json_str)
 
         # Validate and normalize probabilities
         probs = result.get("probabilities", {})
@@ -141,6 +158,7 @@ async def reason(
 
     except json.JSONDecodeError as _err:
         logger.error("Failed to parse LLM JSON response: %s", _err)
+        logger.error("Raw content: %s", content)
         return _fallback_prediction(event)
     except Exception as _err:
         logger.error("LLM reasoning failed: %s", _err)
