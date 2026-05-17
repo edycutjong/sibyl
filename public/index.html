@@ -39,7 +39,7 @@
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%;background:#000;overflow:hidden;
-  font-family:var(--fd);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  color:var(--hi);font-family:var(--fd);-webkit-print-color-adjust:exact;print-color-adjust:exact}
 
 #stage{position:fixed;width:1920px;height:1080px;top:0;left:0;transform-origin:top left}
 
@@ -248,8 +248,8 @@ body.dbg *{outline:1px solid rgba(255,0,0,.25)!important}
   radial-gradient(ellipse 1600px 600px at 50% 85%,color-mix(in srgb,var(--cy) 7%,transparent),transparent)}
 #s5 .inner{position:relative;z-index:1;padding:72px 120px;
   display:flex;flex-direction:column;height:100%}
-#s5 h2{font-size:52px;font-weight:800;letter-spacing:-1.5px;margin-top:10px;margin-bottom:6px}
-#s5 .sub{font-size:18px;color:var(--md);margin-bottom:36px}
+#s5 h2{font-size:52px;font-weight:800;letter-spacing:-1.5px;margin-top:10px;margin-bottom:10px}
+#s5 .sub{font-size:18px;color:var(--md);margin-bottom:56px}
 #s5 .dia{flex:1;display:flex;align-items:center;justify-content:center}
 .arch-dash{stroke-dasharray:6 4;animation:dash-flow .9s linear infinite}
 
@@ -405,7 +405,7 @@ body.dbg *{outline:1px solid rgba(255,0,0,.25)!important}
         <span class="pill">litellm</span>
         <span class="pill">Exa Search</span>
       </div>
-      <p class="url">🚀 <span>https://api.sibyl.edycu.dev/</span></p>
+      <p class="url"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg><span>https://api.sibyl.edycu.dev/</span></p>
     </div>
     <div class="rgt">
       <div class="term">
@@ -468,21 +468,21 @@ body.dbg *{outline:1px solid rgba(255,0,0,.25)!important}
     </div>
     <div class="rgt">
       <div class="pain">
-        <div class="pain-ico">🧊</div>
+        <div class="pain-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/></svg></div>
         <div>
           <div class="pain-ttl">Stale training data</div>
           <div class="pain-txt">LLM knowledge cutoff is months old. No access to today's CPI release, earnings call, or injury report.</div>
         </div>
       </div>
       <div class="pain">
-        <div class="pain-ico">⚡</div>
+        <div class="pain-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg></div>
         <div>
           <div class="pain-ttl">No market anchor</div>
           <div class="pain-txt">Most agents ignore the prediction market price entirely — a free calibrated prior from thousands of traders they're throwing away.</div>
         </div>
       </div>
       <div class="pain">
-        <div class="pain-ico">💸</div>
+        <div class="pain-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg></div>
         <div>
           <div class="pain-ttl">One-size-fits-all routing</div>
           <div class="pain-txt">Running GPT-4 on an 85% confidence sports result is expensive overkill. No cost tiering means burning budget on easy questions.</div>
@@ -552,7 +552,7 @@ body.dbg *{outline:1px solid rgba(255,0,0,.25)!important}
     <h2>8-Step Prediction Pipeline</h2>
     <p class="sub">End-to-end: raw event text → calibrated probability in &lt;500ms</p>
     <div class="dia">
-      <svg viewBox="0 0 1640 340" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:1640px">
+      <svg viewBox="0 0 1640 370" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:1640px">
         <defs>
           <marker id="ac" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
             <polygon points="0 0,7 3,0 6" fill="rgba(6,182,212,0.6)"/>
@@ -596,7 +596,7 @@ body.dbg *{outline:1px solid rgba(255,0,0,.25)!important}
 
         <!-- Split arrows from Classifier to 2 parallel nodes -->
         <path d="M 460 117 L 490 117 L 490 88 L 510 88" stroke="rgba(6,182,212,0.4)" stroke-width="1.5" marker-end="url(#ac)" class="arch-dash" style="animation-delay:.5s"/>
-        <path d="M 460 117 L 490 117 L 490 148 L 510 148" stroke="rgba(6,182,212,0.4)" stroke-width="1.5" marker-end="url(#ac)" class="arch-dash" style="animation-delay:.75s"/>
+        <path d="M 460 117 L 490 117 L 490 178 L 510 178" stroke="rgba(6,182,212,0.4)" stroke-width="1.5" marker-end="url(#ac)" class="arch-dash" style="animation-delay:.75s"/>
 
         <!-- Node: Market Anchor (top) -->
         <rect x="510" y="60" width="152" height="56" rx="11" fill="rgba(6,182,212,0.07)" stroke="rgba(6,182,212,0.35)" stroke-width="1.5"/>
@@ -604,15 +604,15 @@ body.dbg *{outline:1px solid rgba(255,0,0,.25)!important}
         <text x="586" y="100" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono,monospace" font-size="10.5">Bayesian prior</text>
         <text x="586" y="115" text-anchor="middle" fill="#06b6d4" font-family="JetBrains Mono,monospace" font-size="11">p_market = 0.42</text>
 
-        <!-- Node: Retrieval (bottom) -->
-        <rect x="510" y="126" width="152" height="56" rx="11" fill="rgba(6,182,212,0.07)" stroke="rgba(6,182,212,0.35)" stroke-width="1.5"/>
-        <text x="586" y="149" text-anchor="middle" fill="#f8fafc" font-family="Inter Tight,sans-serif" font-size="13" font-weight="700">Evidence Retrieval</text>
-        <text x="586" y="166" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono,monospace" font-size="10.5">Exa / Brave search</text>
-        <text x="586" y="181" text-anchor="middle" fill="#06b6d4" font-family="JetBrains Mono,monospace" font-size="11">4 sources · 3.8k tok</text>
+        <!-- Node: Retrieval (bottom) — moved down for spacing -->
+        <rect x="510" y="150" width="152" height="56" rx="11" fill="rgba(6,182,212,0.07)" stroke="rgba(6,182,212,0.35)" stroke-width="1.5"/>
+        <text x="586" y="173" text-anchor="middle" fill="#f8fafc" font-family="Inter Tight,sans-serif" font-size="13" font-weight="700">Evidence Retrieval</text>
+        <text x="586" y="190" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono,monospace" font-size="10.5">Exa / Brave search</text>
+        <text x="586" y="205" text-anchor="middle" fill="#06b6d4" font-family="JetBrains Mono,monospace" font-size="11">4 sources · 3.8k tok</text>
 
         <!-- Merge both → Assembler -->
-        <path d="M 662 88 L 695 88 L 695 117 L 718 117" stroke="rgba(6,182,212,0.4)" stroke-width="1.5" marker-end="url(#ac)" class="arch-dash" style="animation-delay:1s"/>
-        <path d="M 662 154 L 695 154 L 695 117 L 718 117" stroke="rgba(6,182,212,0.4)" stroke-width="1.5" marker-end="url(#ac)" class="arch-dash" style="animation-delay:1.25s"/>
+        <path d="M 662 88 L 720 88 L 720 117 L 718 117" stroke="rgba(6,182,212,0.4)" stroke-width="1.5" marker-end="url(#ac)" class="arch-dash" style="animation-delay:1s"/>
+        <path d="M 662 178 L 720 178 L 720 117 L 718 117" stroke="rgba(6,182,212,0.4)" stroke-width="1.5" marker-end="url(#ac)" class="arch-dash" style="animation-delay:1.25s"/>
 
         <!-- Node: Assembler -->
         <rect x="718" y="88" width="148" height="58" rx="11" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.45)" stroke-width="1.5"/>
@@ -666,13 +666,13 @@ body.dbg *{outline:1px solid rgba(255,0,0,.25)!important}
         <text x="1530" y="132" text-anchor="middle" fill="#22c55e" font-family="JetBrains Mono,monospace" font-size="11">p(Yes) = 0.63</text>
 
         <!-- Legend -->
-        <rect x="8" y="248" width="13" height="13" rx="3" fill="rgba(6,182,212,0.4)" stroke="#06b6d4" stroke-width="1"/>
-        <text x="26" y="259" fill="#94a3b8" font-family="JetBrains Mono,monospace" font-size="13">Retrieval layer</text>
-        <rect x="175" y="248" width="13" height="13" rx="3" fill="rgba(139,92,246,0.4)" stroke="#8b5cf6" stroke-width="1"/>
-        <text x="193" y="259" fill="#94a3b8" font-family="JetBrains Mono,monospace" font-size="13">AI / LLM layer</text>
-        <rect x="342" y="248" width="13" height="13" rx="3" fill="rgba(34,197,94,0.4)" stroke="#22c55e" stroke-width="1"/>
-        <text x="360" y="259" fill="#94a3b8" font-family="JetBrains Mono,monospace" font-size="13">Calibration layer</text>
-        <text x="1640" y="260" text-anchor="end" fill="#475569" font-family="JetBrains Mono,monospace" font-size="12">avg 180–500ms · 100% completion rate</text>
+        <rect x="8" y="280" width="13" height="13" rx="3" fill="rgba(6,182,212,0.4)" stroke="#06b6d4" stroke-width="1"/>
+        <text x="26" y="291" fill="#94a3b8" font-family="JetBrains Mono,monospace" font-size="13">Retrieval layer</text>
+        <rect x="175" y="280" width="13" height="13" rx="3" fill="rgba(139,92,246,0.4)" stroke="#8b5cf6" stroke-width="1"/>
+        <text x="193" y="291" fill="#94a3b8" font-family="JetBrains Mono,monospace" font-size="13">AI / LLM layer</text>
+        <rect x="342" y="280" width="13" height="13" rx="3" fill="rgba(34,197,94,0.4)" stroke="#22c55e" stroke-width="1"/>
+        <text x="360" y="291" fill="#94a3b8" font-family="JetBrains Mono,monospace" font-size="13">Calibration layer</text>
+        <text x="1640" y="291" text-anchor="end" fill="#475569" font-family="JetBrains Mono,monospace" font-size="12">avg 180–500ms · 100% completion rate</text>
       </svg>
     </div>
   </div>
@@ -746,14 +746,14 @@ body.dbg *{outline:1px solid rgba(255,0,0,.25)!important}
   <div class="gridl"></div>
   <div class="inner rel">
     <div class="fm">
-      <div class="ficon">⚓</div>
+      <div class="ficon"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="ig" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#06b6d4"/><stop offset="100%" stop-color="#8b5cf6"/></linearGradient></defs><circle cx="12" cy="5" r="3" stroke="url(#ig)"/><line x1="12" y1="8" x2="12" y2="22" stroke="url(#ig)"/><path d="M5 12H2a10 10 0 0 0 20 0h-3" stroke="url(#ig)"/></svg></div>
       <span class="tag">feature 01</span>
       <h2>Market<br>Anchoring</h2>
       <p class="fdesc">Instead of asking "what's the probability?", Sibyl asks "how much should I update from what the market already says?" The market price is a calibrated prior from thousands of informed traders. We start there and adjust on fresh evidence.</p>
-      <div class="fmet">📈 Systematic edge over naive LLM baseline</div>
+      <div class="fmet"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>Systematic edge over naive LLM baseline</div>
     </div>
     <div class="fs">
-      <div class="ficon" style="font-size:36px">🗺️</div>
+      <div class="ficon" style="font-size:36px"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
       <div class="sh3">Category Routing</div>
       <p class="sdesc">5 specialized retrieval pipelines — each tuned to its domain's evidence patterns. Sports gets injury feeds. Economics gets macro data. Geopolitics gets Reuters.</p>
       <div class="spills">
@@ -765,7 +765,7 @@ body.dbg *{outline:1px solid rgba(255,0,0,.25)!important}
       </div>
     </div>
     <div class="fs" style="border-top:1px solid var(--br)">
-      <div class="ficon" style="font-size:36px">💰</div>
+      <div class="ficon" style="font-size:36px"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
       <div class="sh3">Cost Tiering</div>
       <p class="sdesc">Route high-confidence events to GPT-4o-mini. Close calls (40–60% market) get Claude 3.5 Sonnet. Full 2-week evaluation window estimated at $15–40.</p>
       <div class="spills">
@@ -859,6 +859,10 @@ body.dbg *{outline:1px solid rgba(255,0,0,.25)!important}
         <span class="aval"><span>api.sibyl.edycu.dev/docs</span></span>
       </div>
       <div class="aline">
+        <span class="alabel">GitHub</span>
+        <span class="aval"><svg width="13" height="13" viewBox="0 0 24 24" fill="#94a3b8" style="display:inline-block;vertical-align:middle;margin-right:5px"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg><span>github.com/edycutjong/sibyl</span></span>
+      </div>
+      <div class="aline">
         <span class="alabel">License</span>
         <span class="aval">MIT · Open source</span>
       </div>
@@ -870,7 +874,7 @@ body.dbg *{outline:1px solid rgba(255,0,0,.25)!important}
     <div class="rgt">
       <div class="team">
         <!-- SWAP: replace emoji with <img src="photo.jpg" style="width:72px;height:72px;border-radius:50%;object-fit:cover"> -->
-        <div class="avatar">👤</div>
+        <div class="avatar"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
         <div>
           <div class="tname">Edy Cu</div>
           <div class="trole">edy.cu@live.com · Full-Stack &amp; ML</div>
@@ -895,7 +899,7 @@ body.dbg *{outline:1px solid rgba(255,0,0,.25)!important}
         </svg>
         <div class="qr-label">api.sibyl.edycu.dev</div>
       </div>
-      <div class="cta">Retrieval beats recency. Every time. 🔮</div>
+      <div class="cta">Retrieval beats recency. Every time.</div>
     </div>
   </div>
   <aside class="speaker-notes">The ask: test Sibyl in the Prophet Arena harness and award Most Technically Sophisticated. The endpoint is live right now — point /chat/completions at it. All 15 Prophet Arena integration touchpoints are wired. We built this to win.</aside>
