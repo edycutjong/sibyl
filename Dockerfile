@@ -2,15 +2,16 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# Install dependencies
+# Copy source first for hatchling wheel build
 COPY pyproject.toml README.md ./
+COPY sibyl/ sibyl/
+
+# Install dependencies and project
 RUN pip install --no-cache-dir .
 
-# Copy source
-COPY sibyl/ sibyl/
+# Copy remaining assets
 COPY scripts/ scripts/
 COPY public/ public/
-
 
 # Port
 ENV PORT=8001
