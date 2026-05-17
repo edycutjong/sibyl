@@ -11,6 +11,7 @@
   SWAP: search "SWAP:" comments to replace placeholder images
 -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2306b6d4'/%3E%3Cstop offset='100%25' stop-color='%238b5cf6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='30' fill='%23020617'/%3E%3Cpolygon points='32,10 44,26 38,26 38,54 26,54 26,26 20,26' fill='url(%23g)'/%3E%3C/svg%3E">
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -881,22 +882,7 @@ body.dbg *{outline:1px solid rgba(255,0,0,.25)!important}
         </div>
       </div>
       <div class="qr">
-        <!-- SWAP: replace with real QR code for api.sibyl.edycu.dev -->
-        <svg width="120" height="120" viewBox="0 0 120 120" style="opacity:.45">
-          <rect x="10" y="10" width="40" height="40" rx="4" fill="none" stroke="#94a3b8" stroke-width="2"/>
-          <rect x="70" y="10" width="40" height="40" rx="4" fill="none" stroke="#94a3b8" stroke-width="2"/>
-          <rect x="10" y="70" width="40" height="40" rx="4" fill="none" stroke="#94a3b8" stroke-width="2"/>
-          <rect x="20" y="20" width="20" height="20" rx="2" fill="#94a3b8"/>
-          <rect x="80" y="20" width="20" height="20" rx="2" fill="#94a3b8"/>
-          <rect x="20" y="80" width="20" height="20" rx="2" fill="#94a3b8"/>
-          <rect x="70" y="70" width="8" height="8" rx="1" fill="#94a3b8"/>
-          <rect x="82" y="70" width="8" height="8" rx="1" fill="#94a3b8"/>
-          <rect x="94" y="70" width="8" height="8" rx="1" fill="#94a3b8"/>
-          <rect x="70" y="82" width="8" height="8" rx="1" fill="#94a3b8"/>
-          <rect x="94" y="82" width="8" height="8" rx="1" fill="#94a3b8"/>
-          <rect x="70" y="94" width="8" height="8" rx="1" fill="#94a3b8"/>
-          <rect x="82" y="94" width="8" height="8" rx="1" fill="#94a3b8"/>
-        </svg>
+        <canvas id="qr-canvas"></canvas>
         <div class="qr-label">api.sibyl.edycu.dev</div>
       </div>
       <div class="cta">Retrieval beats recency. Every time.</div>
@@ -992,6 +978,14 @@ document.addEventListener('touchend', e => {
 }, {passive:true});
 
 updateNotes();
+
+// Real QR code
+if (typeof QRCode !== 'undefined') {
+  QRCode.toCanvas(document.getElementById('qr-canvas'), 'https://api.sibyl.edycu.dev/', {
+    width: 148, margin: 1,
+    color: { dark: '#f8fafc', light: '#0f172a' }
+  });
+}
 </script>
 </body>
 </html>
