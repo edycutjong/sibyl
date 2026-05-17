@@ -1,6 +1,9 @@
 """Tests for sibyl.classifier — event category classification."""
 
-from sibyl.classifier import CATEGORIES, classify_by_keywords
+import pytest
+
+from sibyl.classifier import CATEGORIES, classify_by_keywords, classify_event
+from sibyl.config import Settings
 
 
 class TestKeywordClassifier:
@@ -53,11 +56,6 @@ class TestCategories:
         assert len(CATEGORIES) == 6
         assert "Sports" in CATEGORIES
         assert "Other" in CATEGORIES
-
-import pytest
-
-from sibyl.classifier import classify_event
-from sibyl.config import Settings
 
 
 @pytest.mark.asyncio

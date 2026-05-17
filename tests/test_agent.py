@@ -1,6 +1,12 @@
 """Tests for sibyl.agent — core prediction pipeline."""
 
 
+from sibyl.agent import (
+    _prediction_stats,
+    get_prediction_stats,
+    predict,
+    startup,
+)
 from sibyl.parser import normalize_event
 
 
@@ -67,13 +73,6 @@ class TestCalibration:
         probs = {"Yes": 0.65, "No": 0.35}
         result = calibrate_predictions(probs)
         assert result == probs
-
-from sibyl.agent import (
-    _prediction_stats,
-    get_prediction_stats,
-    predict,
-    startup,
-)
 
 
 class TestAgentPipeline:

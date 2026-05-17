@@ -49,7 +49,7 @@ async def main():
                 if str(prob_obj.get("market")).lower() in ("yes", "1", "true"):
                     p = prob_obj.get("probability", 0.5)
                     break
-            
+
             # If event has resolution info
             actual = event.get("resolved_outcome", event.get("resolution"))
             if actual is not None:

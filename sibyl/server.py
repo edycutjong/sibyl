@@ -135,18 +135,18 @@ async def chat_completions(
     """OpenAI-compatible chat completions endpoint."""
     if not request.messages:
         raise HTTPException(status_code=400, detail="Messages list cannot be empty")
-        
+
     prompt = request.messages[0].content
     if not prompt:
         raise HTTPException(status_code=400, detail="Prompt content cannot be empty")
-        
-    from sibyl.parser import parse_event_from_prompt, normalize_event
-    
+
+    from sibyl.parser import normalize_event, parse_event_from_prompt
+
     raw_event = parse_event_from_prompt(prompt)
     event = normalize_event(raw_event)
-    
+
     result = await predict(event)
-    
+
     return {
         "id": f"chatcmpl-{int(time.time())}",
         "object": "chat.completion",
