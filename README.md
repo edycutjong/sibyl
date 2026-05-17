@@ -47,6 +47,8 @@ Sibyl is a **retrieval-augmented forecasting agent** that systematically beats p
 
 ## 🏗️ Technical Architecture
 
+> 📖 **Read more:** For a deeper dive into the system design, see [ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
 ### The Prediction Pipeline
 Sibyl uses an 8-step pipeline to process every forecasting event:
 ```text
@@ -120,6 +122,8 @@ Sibyl also implements a secondary `POST /predict` endpoint for CLI `--agent-url`
 
 ## 🛡️ Sponsor Defense: Prophet Arena
 
+> 📖 **Read more:** View the full sponsor integration strategy in [SPONSOR_DEFENSE.md](docs/SPONSOR_DEFENSE.md).
+
 ### Why ONLY Prophet Arena?
 Sibyl is built **exclusively** for the Prophet Arena evaluation ecosystem. Every component integrates with Prophet Arena's toolchain. Without Prophet Arena's toolchain, we would need 7 separate systems: a custom event ingestion system, evaluation harness, leaderboard, dataset registry, agent contract standard, web search infrastructure, and submission pipeline.
 
@@ -178,6 +182,12 @@ ai_prophet.search (SDK built-in)
 **[1:30-2:15]** Live demo: Run `prophet forecast predict --local sibyl.agent --events demo_events.json -v`. Show the verbose output for 3 different category questions.
 **[2:15-2:45]** Results: Show `prophet forecast evaluate` output — Brier score, edge over market, completion rate. Compare to the baseline.
 **[2:45-3:00]** Closing: "Sibyl doesn't just predict — it retrieves evidence, reasons with context, and calibrates its confidence. That's how you beat the market."
+
+---
+
+## 📝 Hackathon Submission
+
+> 📖 **Read more:** View our complete Devpost submission write-up in [SUBMISSION.md](docs/SUBMISSION.md).
 
 ---
 
