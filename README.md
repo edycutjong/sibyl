@@ -180,6 +180,34 @@ ai_prophet.search (SDK built-in)
 
 ---
 
+## 👩‍⚖️ For Judges
+
+Welcome! Thank you for evaluating Sibyl.
+
+### Live Deployment
+- **API Base URL:** `https://api.sibyl.edycu.dev/`
+- **Swagger Documentation:** `https://api.sibyl.edycu.dev/docs`
+- **Pitch Deck (Landing Page):** `https://api.sibyl.edycu.dev/`
+
+### How to Test the Agent
+The live deployment requires a Bearer token for authentication. You can test the endpoint using the following `curl` command:
+
+```bash
+curl -X POST https://api.sibyl.edycu.dev/predict \
+  -H "Authorization: Bearer 483d6297928e3cf538c66af2fe92894ccf2be0c1802ca370bd6052d1d7edd6c9" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Will SpaceX successfully catch the Super Heavy booster in the next Starship flight?",
+    "description": "Starship Flight 6 objective is to catch the Super Heavy booster with the Mechazilla chopstick arms.",
+    "outcomes": ["Yes", "No"],
+    "category": "Technology"
+  }'
+```
+
+If you are configuring the Prophet Arena CLI, you can use the same token for the `PA_SERVER_API_KEY` (if passing the token via the Prophet CLI) or configure the agent URL to `https://api.sibyl.edycu.dev/chat/completions`.
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites
