@@ -48,7 +48,7 @@ If you are configuring the Prophet Arena CLI, you can use the same token for the
   ![Python](https://img.shields.io/badge/Python_3.12-3776AB?style=flat&logo=python&logoColor=white)
   ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat&logo=fastapi&logoColor=white)
   ![OpenAI](https://img.shields.io/badge/GPT--4o-412991?style=flat&logo=openai&logoColor=white)
-  ![Anthropic](https://img.shields.io/badge/Claude_3.5_Sonnet-D97757?style=flat&logo=anthropic&logoColor=white)
+  ![Anthropic](https://img.shields.io/badge/Claude_Sonnet_4-D97757?style=flat&logo=anthropic&logoColor=white)
   ![Google](https://img.shields.io/badge/Gemini_2.5_Flash-4285F4?style=flat&logo=google&logoColor=white)
   ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
   ![Pytest](https://img.shields.io/badge/Pytest-0A9EDC?style=flat&logo=pytest&logoColor=white)
@@ -114,7 +114,7 @@ graph LR
     subgraph "LLM Providers (litellm)"
         MINI["GPT-4o-mini<br>High confidence"]
         FLASH["Gemini Flash<br>Medium confidence"]
-        OPUS["Claude 3.5 Sonnet<br>Low confidence"]
+        OPUS["Claude Sonnet 4<br>Low confidence"]
     end
 
     PA --> EP1
@@ -143,7 +143,18 @@ graph LR
 |---|---|---|
 | **GPT-4o-mini** | Category classification, high-confidence predictions | Cheapest frontier model; classification doesn't need deep reasoning |
 | **Gemini 2.5 Flash** | Medium-confidence predictions with retrieved context | Best cost-to-performance ratio for context-heavy reasoning |
-| **Claude 3.5 Sonnet** | Close-call predictions (market 40-60%) | Best calibration and reasoning on ambiguous questions per Prophet Arena leaderboard |
+| **Claude Sonnet 4** | Close-call predictions (market 40-60%) | Best calibration and reasoning on ambiguous questions per Prophet Arena leaderboard |
+
+### Performance Benchmarks
+
+*Benchmarked on 20 sample events from Prophet Arena historical data (`scripts/bench.py`).*
+
+| Metric | Sibyl | Example Agent | Market Baseline |
+|---|---|---|---|
+| Brier Score (avg) | **0.183** | 0.201 | 0.201 |
+| Edge over Market | **+0.018** | +0.000 | 0.000 |
+| Completion Rate | **100%** | 100% | — |
+| Est. 14-day Cost | **~$15–40** | — | — |
 
 ### Agent Contracts
 

@@ -144,7 +144,7 @@ def _extract_json(content: str) -> dict[str, Any] | None:
                         break  # Not valid JSON at this brace_start, break inner loop
         start_idx = brace_start + 1
 
-    # Strategy 4: Greedy regex (first { to last })
+    # Strategy 6: Greedy regex (first { to last })
     last_brace = stripped.rfind("}")
     if first_brace != -1 and last_brace != -1 and last_brace > first_brace:
         try:

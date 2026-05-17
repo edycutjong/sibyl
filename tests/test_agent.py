@@ -113,7 +113,7 @@ class TestAgentPipeline:
         mocker.patch("sibyl.agent.reason", return_value={
             "probabilities": {"A": 0.5, "B": 0.3, "C": 0.2},
             "rationale": "Maybe A.",
-            "model": "claude-3-5-sonnet-20241022"
+            "model": "claude-sonnet-4-20250514"
         })
 
         event = {"title": "Who will win?", "outcomes": ["A", "B", "C"]}
