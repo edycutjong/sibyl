@@ -98,18 +98,18 @@ def _extract_json(content: str) -> dict[str, Any] | None:
         except json.JSONDecodeError:
             pass
 
-    # Strategy 1b: Strip markdown fences if they are at the edges
+    # Strategy 2: Strip markdown fences if they are at the edges
     stripped = re.sub(r"^```(?:json)?\s*", "", cleaned)
     stripped = re.sub(r"\s*```$", "", stripped)
     stripped = stripped.strip()
 
-    # Strategy 2: Direct parse
+    # Strategy 3: Direct parse
     try:
         return json.loads(stripped)
     except json.JSONDecodeError:
         pass
 
-    # Strategy 5: Fix truncated JSON — close open strings and braces
+    # Strategy 4: Fix truncated JSON — close open strings and braces
     first_brace = stripped.find("{")
     if first_brace != -1:
         fragment = stripped[first_brace:]
@@ -124,7 +124,7 @@ def _extract_json(content: str) -> dict[str, Any] | None:
         except json.JSONDecodeError:
             pass
 
-    # Strategy 3: Find outermost { ... } with balanced braces, searching all {
+    # Strategy 5: Find outermost { ... } with balanced braces, searching all {
     start_idx = 0
     while True:
         brace_start = stripped.find("{", start_idx)

@@ -1,3 +1,32 @@
+## 👩‍⚖️ For Judges
+
+Welcome! Thank you for evaluating Sibyl.
+
+### Live Deployment
+- **API Base URL:** `https://api.sibyl.edycu.dev/`
+- **Swagger Documentation:** `https://api.sibyl.edycu.dev/docs`
+- **Pitch Deck (Landing Page):** `https://api.sibyl.edycu.dev/`
+- **Demo Video:** [YouTube](https://youtu.be/qD5kDq3NXto)
+
+### How to Test the Agent
+The live deployment requires a Bearer token for authentication. You can test the endpoint using the following `curl` command:
+
+```bash
+curl -X POST https://api.sibyl.edycu.dev/predict \
+  -H "Authorization: Bearer 483d6297928e3cf538c66af2fe92894ccf2be0c1802ca370bd6052d1d7edd6c9" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Will SpaceX successfully catch the Super Heavy booster in the next Starship flight?",
+    "description": "Starship Flight 6 objective is to catch the Super Heavy booster with the Mechazilla chopstick arms.",
+    "outcomes": ["Yes", "No"],
+    "category": "Technology"
+  }'
+```
+
+If you are configuring the Prophet Arena CLI, you can use the same token for the `PA_SERVER_API_KEY` (if passing the token via the Prophet CLI) or configure the agent URL to `https://api.sibyl.edycu.dev/chat/completions`.
+
+---
+
 <div align="center">
   <h1>Sibyl 🔮</h1>
   <p><em>Retrieval-augmented forecasting agent for Prophet Arena — calibrated probability predictions with cost-tiered LLM routing.</em></p>
@@ -5,9 +34,13 @@
 
   <br/>
 
-  [![Live Demo](https://img.shields.io/badge/🚀_Live-Demo-06b6d4?style=for-the-badge)](https://github.com/edycutjong/sibyl)
-  [![Pitch Video](https://img.shields.io/badge/🎬_Pitch-Video-ef4444?style=for-the-badge)](https://youtu.be/your-video)
-  [![Pitch Deck](https://img.shields.io/badge/📊_Pitch-Deck-f59e0b?style=for-the-badge)](https://github.com/edycutjong/sibyl/pitch)
+  <img src="https://github.com/user-attachments/assets/307b80b7-c3fd-4d84-9998-38836c81e2bd" alt="Demo" width="100%">
+
+  <br/>
+
+  [![Live API](https://img.shields.io/badge/🚀_Live-API_Docs-06b6d4?style=for-the-badge)](https://api.sibyl.edycu.dev/docs)
+  [![Pitch Video](https://img.shields.io/badge/🎬_Pitch-Video-ef4444?style=for-the-badge)](https://youtu.be/qD5kDq3NXto)
+  [![Pitch Deck](https://img.shields.io/badge/📊_Pitch-Deck-f59e0b?style=for-the-badge)](https://api.sibyl.edycu.dev/)
   [![Built for Prophet Hacks](https://img.shields.io/badge/Devpost-Prophet_Hacks-8b5cf6?style=for-the-badge)](https://prophethacks.devpost.com/)
 
   <br/>
@@ -177,34 +210,6 @@ ai_prophet.search (SDK built-in)
 ## 📝 Hackathon Submission
 
 > 📖 **Read more:** View our complete Devpost submission write-up in [SUBMISSION.md](docs/SUBMISSION.md).
-
----
-
-## 👩‍⚖️ For Judges
-
-Welcome! Thank you for evaluating Sibyl.
-
-### Live Deployment
-- **API Base URL:** `https://api.sibyl.edycu.dev/`
-- **Swagger Documentation:** `https://api.sibyl.edycu.dev/docs`
-- **Pitch Deck (Landing Page):** `https://api.sibyl.edycu.dev/`
-
-### How to Test the Agent
-The live deployment requires a Bearer token for authentication. You can test the endpoint using the following `curl` command:
-
-```bash
-curl -X POST https://api.sibyl.edycu.dev/predict \
-  -H "Authorization: Bearer 483d6297928e3cf538c66af2fe92894ccf2be0c1802ca370bd6052d1d7edd6c9" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Will SpaceX successfully catch the Super Heavy booster in the next Starship flight?",
-    "description": "Starship Flight 6 objective is to catch the Super Heavy booster with the Mechazilla chopstick arms.",
-    "outcomes": ["Yes", "No"],
-    "category": "Technology"
-  }'
-```
-
-If you are configuring the Prophet Arena CLI, you can use the same token for the `PA_SERVER_API_KEY` (if passing the token via the Prophet CLI) or configure the agent URL to `https://api.sibyl.edycu.dev/chat/completions`.
 
 ---
 
