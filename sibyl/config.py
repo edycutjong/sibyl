@@ -4,8 +4,11 @@ from __future__ import annotations
 
 from functools import lru_cache
 
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
+# Load .env into os.environ so third-party libraries (like litellm) can access them
+load_dotenv()
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
@@ -32,7 +35,7 @@ class Settings(BaseSettings):
 
     # ── Model Selection Defaults ───────────────────────────────
     model_high_confidence: str = "gpt-4o-mini"
-    model_medium_confidence: str = "gemini/gemini-2.5-flash-preview-05-20"
+    model_medium_confidence: str = "gemini/gemini-2.5-flash"
     model_low_confidence: str = "claude-sonnet-4-20250514"
     model_classifier: str = "gpt-4o-mini"
 
