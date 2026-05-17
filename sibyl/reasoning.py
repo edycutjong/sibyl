@@ -109,6 +109,21 @@ def _extract_json(content: str) -> dict[str, Any] | None:
     except json.JSONDecodeError:
         pass
 
+    # Strategy 5: Fix truncated JSON — close open strings and braces
+    first_brace = stripped.find("{")
+    if first_brace != -1:
+        fragment = stripped[first_brace:]
+        # Close any open string
+        if fragment.count('"') % 2 != 0:
+            fragment += '"'
+        # Close open braces
+        open_braces = fragment.count("{") - fragment.count("}")
+        fragment += "}" * max(0, open_braces)
+        try:
+            return json.loads(fragment)
+        except json.JSONDecodeError:
+            pass
+
     # Strategy 3: Find outermost { ... } with balanced braces, searching all {
     start_idx = 0
     while True:
@@ -130,25 +145,10 @@ def _extract_json(content: str) -> dict[str, Any] | None:
         start_idx = brace_start + 1
 
     # Strategy 4: Greedy regex (first { to last })
-    first_brace = stripped.find("{")
     last_brace = stripped.rfind("}")
     if first_brace != -1 and last_brace != -1 and last_brace > first_brace:
         try:
             return json.loads(stripped[first_brace : last_brace + 1])
-        except json.JSONDecodeError:
-            pass
-
-    # Strategy 5: Fix truncated JSON — close open strings and braces
-    if first_brace != -1:
-        fragment = stripped[first_brace:]
-        # Close any open string
-        if fragment.count('"') % 2 != 0:
-            fragment += '"'
-        # Close open braces
-        open_braces = fragment.count("{") - fragment.count("}")
-        fragment += "}" * max(0, open_braces)
-        try:
-            return json.loads(fragment)
         except json.JSONDecodeError:
             pass
 

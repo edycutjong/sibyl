@@ -52,10 +52,10 @@ class TestModelRouting:
         model = select_model(market_confidence=0.1, category="Geopolitics")
         assert "claude" in model.lower() or "sonnet" in model.lower()
 
-    def test_medium_confidence_uses_flash(self):
+    def test_medium_confidence_uses_default(self):
         from sibyl.model_router import select_model
         model = select_model(market_confidence=0.5, category="Sports")
-        assert "gemini" in model.lower() or "flash" in model.lower()
+        assert "mini" in model.lower() or "gpt-4o" in model.lower()
 
 
 class TestCalibration:

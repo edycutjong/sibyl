@@ -154,6 +154,12 @@ def test_extract_json_markdown_fences():
     assert _extract_json('```\n{"a": 1}\n```') == {"a": 1}
 
 
+def test_extract_json_bad_markdown():
+    # Strategy 1 matched but invalid JSON, should fall through and find valid JSON
+    result = _extract_json('```json\n{bad_json}\n```\n{"A": 1}')
+    assert result == {"A": 1}
+
+
 def test_extract_json_prose_with_json():
     result = _extract_json('Some analysis text.\n{"probabilities": {"Yes": 0.7}}\nMore text')
     assert result == {"probabilities": {"Yes": 0.7}}

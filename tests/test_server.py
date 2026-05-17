@@ -188,3 +188,9 @@ class TestChatCompletionsValidation:
         )
         assert response.status_code == 400
         assert "Prompt content cannot be empty" in response.json()["detail"]
+
+
+class TestRootEndpoint:
+    def test_root_serves_index(self, client):
+        response = client.get("/")
+        assert response.status_code == 200
