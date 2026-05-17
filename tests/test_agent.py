@@ -72,7 +72,6 @@ from sibyl.agent import (
     _prediction_stats,
     get_prediction_stats,
     predict,
-    predict_from_prompt,
     startup,
 )
 
@@ -97,8 +96,10 @@ class TestAgentPipeline:
         event = {"title": "Will it happen?", "outcomes": ["Yes", "No"]}
         res = await predict(event)
 
-        assert "p_yes" in res
-        assert res["p_yes"] == 0.7
+        assert "probabilities" in res
+        assert len(res["probabilities"]) == 2
+        assert res["probabilities"][0]["market"] == "Yes"
+        assert res["probabilities"][0]["probability"] == 0.7
         assert res["rationale"] == "It's likely."
 
         stats = get_prediction_stats()
@@ -124,11 +125,7 @@ class TestAgentPipeline:
         assert res["probabilities"][0]["market"] == "A"
         assert res["probabilities"][0]["probability"] == 0.5
 
-    async def test_predict_from_prompt(self, mocker):
-        """Should parse prompt and call predict."""
-        mocker.patch("sibyl.agent.predict", return_value={"p_yes": 0.8})
-        res = await predict_from_prompt('{"title": "Test", "outcomes": ["Yes", "No"]}')
-        assert res["p_yes"] == 0.8
+
 
     def test_startup(self, mocker):
         """Should initialize agent."""

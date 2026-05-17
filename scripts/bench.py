@@ -42,21 +42,23 @@ async def main():
         try:
             result = await predict(event)
 
-            # For binary events with known resolution
-            if "p_yes" in result:
-                p = result["p_yes"]
-                # If event has resolution info
-                actual = event.get("resolved_outcome", event.get("resolution"))
-                if actual is not None:
-                    actual_binary = 1 if str(actual).lower() in ("yes", "1", "true") else 0
-                    brier = (p - actual_binary) ** 2
-                    brier_scores.append(brier)
-                    print(f"   p_yes={p:.4f} | actual={actual_binary} | brier={brier:.4f}")
-                else:
-                    print(f"   p_yes={p:.4f} (no resolution data)")
+            # Extract 'yes' probability
+            p = 0.5
+            probs = result.get("probabilities", [])
+            for prob_obj in probs:
+                if str(prob_obj.get("market")).lower() in ("yes", "1", "true"):
+                    p = prob_obj.get("probability", 0.5)
+                    break
+            
+            # If event has resolution info
+            actual = event.get("resolved_outcome", event.get("resolution"))
+            if actual is not None:
+                actual_binary = 1 if str(actual).lower() in ("yes", "1", "true") else 0
+                brier = (p - actual_binary) ** 2
+                brier_scores.append(brier)
+                print(f"   p_yes={p:.4f} | actual={actual_binary} | brier={brier:.4f}")
             else:
-                probs = result.get("probabilities", [])
-                print(f"   probabilities: {probs}")
+                print(f"   p_yes={p:.4f} (no resolution data)")
 
         except Exception as err:
             print(f"   ❌ Error: {err}")

@@ -5,7 +5,6 @@ The full prediction pipeline:
 
 This module provides:
   - predict(event) → dict : CLI-compatible entry point
-  - predict_from_prompt(prompt) → dict : OpenAI-compatible entry point
 """
 
 from __future__ import annotations
@@ -18,7 +17,7 @@ from sibyl.anchor import anchor_confidence, get_market_anchor
 from sibyl.calibration import calibrate_predictions, load_calibration_model
 from sibyl.classifier import classify_event
 from sibyl.model_router import select_model
-from sibyl.parser import normalize_event, parse_event_from_prompt
+from sibyl.parser import normalize_event
 from sibyl.reasoning import reason
 from sibyl.retrieval import format_context, retrieve_context
 
@@ -62,9 +61,8 @@ async def predict(event: dict[str, Any]) -> dict[str, Any]:
         event: Raw event dict with at least 'title' and 'outcomes'
 
     Returns:
-        Dict with EITHER:
-          - {"p_yes": float, "rationale": str} for binary events
-          - {"probabilities": list[dict], "rationale": str} for multi-outcome
+        Dict with format:
+          - {"probabilities": list[dict], "rationale": str}
     """
     start = time.monotonic()
 
@@ -124,40 +122,15 @@ async def predict(event: dict[str, Any]) -> dict[str, Any]:
         "latency_ms": latency_ms,
     })
 
-    # Format based on outcome count
-    is_binary = len(outcomes) == 2 and "Yes" in outcomes and "No" in outcomes
-
-    if is_binary:
-        p_yes = calibrated.get("Yes", 0.5)
-        return {
-            "p_yes": round(max(0.01, min(0.99, p_yes)), 4),
-            "rationale": result.get("rationale", ""),
-        }
-    else:
-        # Multi-outcome format: list of {market, probability}
-        prob_list = [
-            {"market": outcome, "probability": round(calibrated.get(outcome, 0.01), 4)}
-            for outcome in outcomes
-        ]
-        return {
-            "probabilities": prob_list,
-            "rationale": result.get("rationale", ""),
-        }
-
-
-async def predict_from_prompt(prompt: str) -> dict[str, Any]:
-    """Extract event from a chat prompt and run prediction.
-
-    This is the entry point for the OpenAI-compatible /chat/completions endpoint.
-
-    Args:
-        prompt: User message content from the chat request
-
-    Returns:
-        Same format as predict()
-    """
-    event = parse_event_from_prompt(prompt)
-    return await predict(event)
+    # Always return multi-outcome format: list of {market, probability}
+    prob_list = [
+        {"market": outcome, "probability": round(calibrated.get(outcome, 0.01), 4)}
+        for outcome in outcomes
+    ]
+    return {
+        "probabilities": prob_list,
+        "rationale": result.get("rationale", ""),
+    }
 
 
 # ── Startup ────────────────────────────────────────────────────
