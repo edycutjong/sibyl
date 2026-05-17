@@ -9,7 +9,7 @@ RUN pip install --no-cache-dir .
 # Copy source
 COPY sibyl/ sibyl/
 COPY scripts/ scripts/
-COPY data/ data/ 2>/dev/null || true
+
 
 # Port
 ENV PORT=8001
