@@ -1,4 +1,4 @@
-# Sibyl — Technical Architecture
+# OracleChain — Technical Architecture
 
 ## Tech Stack
 
@@ -36,7 +36,7 @@ graph TB
         CLI["prophet forecast predict<br>--local / --agent-url"]
     end
 
-    subgraph "Sibyl Agent (FastAPI)"
+    subgraph "OracleChain Agent (FastAPI)"
         EP1["POST /chat/completions<br>(Prophet Arena eval)"]
         EP2["POST /predict<br>(CLI testing)"]
         PARSE["Event Parser<br>Extract from prompt/JSON"]
@@ -84,7 +84,7 @@ graph TB
 
 ```json
 // Request from Prophet Arena
-{"model": "sibyl-v1", "messages": [{"role": "user", "content": "<prompt>"}]}
+{"model": "oraclechain-v1", "messages": [{"role": "user", "content": "<prompt>"}]}
 
 // Response: probabilities embedded in content string
 {"choices": [{"message": {"content": "{\"probabilities\": [{\"market\": \"Cleveland\", \"probability\": 0.68}, {\"market\": \"Detroit\", \"probability\": 0.32}], \"rationale\": \"...\"}"}]}]
@@ -104,11 +104,11 @@ graph TB
 
 ### Contract C: Local Module (CLI `--local` testing)
 ```python
-# sibyl/agent.py
+# oraclechain/agent.py
 def predict(event: dict) -> dict:
     """
     CLI-compatible entry point. Used with:
-      prophet forecast predict --local sibyl.agent --events events.json
+      prophet forecast predict --local oraclechain.agent --events events.json
 
     Returns EITHER:
       {"p_yes": 0.68, "rationale": "..."}  # binary
@@ -119,12 +119,12 @@ def predict(event: dict) -> dict:
 
 ## Project Structure
 ```
-sibyl/
+oraclechain/
 ├── pyproject.toml            # Dependencies
 ├── README.md
 ├── ARCHITECTURE.md           # This document
 ├── .env.example              # Required API keys
-├── sibyl/
+├── oraclechain/
 │   ├── __init__.py
 │   ├── agent.py              # Core predict() function (CLI-compatible, dual format)
 │   ├── server.py             # FastAPI: /chat/completions (OpenAI) + /predict (CLI)
@@ -211,7 +211,7 @@ No database needed. This is a stateless agent:
 
 Start from the `ai-prophet/example-api` pattern:
 ```bash
-mkdir sibyl && cd sibyl
+mkdir oraclechain && cd oraclechain
 python -m venv .venv && source .venv/bin/activate
 pip install ai-prophet-core ai-prophet litellm fastapi uvicorn httpx beautifulsoup4 scikit-learn diskcache pydantic python-dotenv
 ```

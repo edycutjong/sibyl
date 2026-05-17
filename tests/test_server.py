@@ -109,3 +109,70 @@ class TestChatCompletionsEndpoint:
             content = data["choices"][0]["message"]["content"]
             parsed = json.loads(content)
             assert "p_yes" in parsed or "probabilities" in parsed
+
+
+class TestAuth:
+    """Tests for token authentication."""
+
+    def test_auth_missing_token(self, monkeypatch):
+        import sibyl.config
+        sibyl.config.get_settings.cache_clear()
+        monkeypatch.setenv("BEARER_TOKEN", "secret")
+
+        # Fresh client without overriding bearer token to empty
+        client = TestClient(app)
+        response = client.get("/stats") # Stats doesn't need auth, wait predict does
+        # let's test predict
+        response = client.post(
+            "/predict",
+            json={"event_ticker": "TEST-1", "title": "Will it rain tomorrow?", "outcomes": ["Yes", "No"], "category": "Other"}
+        )
+        assert response.status_code == 401
+        assert response.json()["detail"] == "Invalid or missing Bearer token"
+
+        sibyl.config.get_settings.cache_clear()
+
+    def test_auth_invalid_token(self, monkeypatch):
+        import sibyl.config
+        sibyl.config.get_settings.cache_clear()
+        monkeypatch.setenv("BEARER_TOKEN", "secret")
+        client = TestClient(app)
+        response = client.post(
+            "/predict",
+            headers={"Authorization": "Bearer wrong"},
+            json={"event_ticker": "TEST-1", "title": "Will it rain tomorrow?", "outcomes": ["Yes", "No"], "category": "Other"}
+        )
+        assert response.status_code == 401
+        sibyl.config.get_settings.cache_clear()
+
+    def test_auth_valid_token(self, monkeypatch):
+        import sibyl.config
+        sibyl.config.get_settings.cache_clear()
+        monkeypatch.setenv("BEARER_TOKEN", "secret")
+        client = TestClient(app)
+        response = client.post(
+            "/predict",
+            headers={"Authorization": "Bearer secret"},
+            json={"event_ticker": "TEST-1", "title": "Will it rain tomorrow?", "outcomes": ["Yes", "No"], "category": "Other"}
+        )
+        assert response.status_code in (200, 500)
+        sibyl.config.get_settings.cache_clear()
+
+class TestLifespan:
+    def test_lifespan_execution(self):
+        with TestClient(app) as client:
+            response = client.get("/health")
+            assert response.status_code == 200
+
+class TestPredictEndpointFallback:
+    def test_predict_uses_question_as_title(self, client):
+        response = client.post(
+            "/predict",
+            json={
+                "event_ticker": "TEST-1",
+                "question": "Will it rain tomorrow?",
+                "outcomes": ["Yes", "No"],
+                "category": "Other",
+            },
+        )
+        assert response.status_code in (200, 500)

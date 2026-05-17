@@ -39,3 +39,7 @@ htmlcov/
 # Data (generated)
 data/fixtures/*.json
 data/models/*.pkl
+
+# Assets
+docs/assets
+assets/

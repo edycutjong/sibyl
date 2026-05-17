@@ -1,6 +1,5 @@
 """Tests for sibyl.agent — core prediction pipeline."""
 
-import pytest
 
 from sibyl.parser import normalize_event
 
@@ -68,3 +67,77 @@ class TestCalibration:
         probs = {"Yes": 0.65, "No": 0.35}
         result = calibrate_predictions(probs)
         assert result == probs
+
+from sibyl.agent import (
+    _prediction_stats,
+    get_prediction_stats,
+    predict,
+    predict_from_prompt,
+    startup,
+)
+
+
+class TestAgentPipeline:
+    """Tests for the main agent pipeline."""
+
+    async def test_predict_binary(self, mocker):
+        """Should return p_yes format for binary event."""
+        # Clear stats
+        _prediction_stats.clear()
+
+        mocker.patch("sibyl.agent.classify_event", return_value="Sports")
+        mocker.patch("sibyl.agent.retrieve_context", return_value=[])
+        mocker.patch("sibyl.agent.get_market_anchor", return_value={"market": 0.6})
+        mocker.patch("sibyl.agent.reason", return_value={
+            "probabilities": {"Yes": 0.7, "No": 0.3},
+            "rationale": "It's likely.",
+            "model": "gpt-4o-mini"
+        })
+
+        event = {"title": "Will it happen?", "outcomes": ["Yes", "No"]}
+        res = await predict(event)
+
+        assert "p_yes" in res
+        assert res["p_yes"] == 0.7
+        assert res["rationale"] == "It's likely."
+
+        stats = get_prediction_stats()
+        assert stats["total"] == 1
+        assert stats["categories"]["Sports"] == 1
+
+    async def test_predict_multi(self, mocker):
+        """Should return probabilities list for multi-outcome."""
+        mocker.patch("sibyl.agent.classify_event", return_value="Geopolitics")
+        mocker.patch("sibyl.agent.retrieve_context", return_value=[])
+        mocker.patch("sibyl.agent.get_market_anchor", return_value={})
+        mocker.patch("sibyl.agent.reason", return_value={
+            "probabilities": {"A": 0.5, "B": 0.3, "C": 0.2},
+            "rationale": "Maybe A.",
+            "model": "claude-3-5-sonnet-20241022"
+        })
+
+        event = {"title": "Who will win?", "outcomes": ["A", "B", "C"]}
+        res = await predict(event)
+
+        assert "probabilities" in res
+        assert len(res["probabilities"]) == 3
+        assert res["probabilities"][0]["market"] == "A"
+        assert res["probabilities"][0]["probability"] == 0.5
+
+    async def test_predict_from_prompt(self, mocker):
+        """Should parse prompt and call predict."""
+        mocker.patch("sibyl.agent.predict", return_value={"p_yes": 0.8})
+        res = await predict_from_prompt('{"title": "Test", "outcomes": ["Yes", "No"]}')
+        assert res["p_yes"] == 0.8
+
+    def test_startup(self, mocker):
+        """Should initialize agent."""
+        mock_load = mocker.patch("sibyl.agent.load_calibration_model")
+        startup()
+        mock_load.assert_called_once()
+
+    def test_empty_stats(self):
+        """Should return 0s when no stats."""
+        _prediction_stats.clear()
+        stats = get_prediction_stats()
+        assert stats["total"] == 0

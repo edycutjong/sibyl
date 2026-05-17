@@ -8,7 +8,7 @@ version = "1.0.0"
 description = "Retrieval-augmented forecasting agent for Prophet Arena — calibrated probability predictions with cost-tiered LLM routing"
 readme = "README.md"
 license = "MIT"
-requires-python = ">=3.12"
+requires-python = ">=3.11"
 authors = [{ name = "Sibyl Team" }]
 
 dependencies = [

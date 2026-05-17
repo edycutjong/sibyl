@@ -7,7 +7,6 @@ Uses GPT-4o-mini with few-shot examples, with keyword-based fallback.
 from __future__ import annotations
 
 import logging
-import re
 
 import litellm
 

@@ -53,3 +53,68 @@ class TestCategories:
         assert len(CATEGORIES) == 6
         assert "Sports" in CATEGORIES
         assert "Other" in CATEGORIES
+
+import pytest
+
+from sibyl.classifier import classify_event
+from sibyl.config import Settings
+
+
+@pytest.mark.asyncio
+class TestClassifyEvent:
+    """Tests for async classify_event function."""
+
+    async def test_uses_category_hint(self):
+        """Should bypass all logic if hint is a valid category."""
+        res = await classify_event("Will it rain?", category_hint="Sports")
+        assert res == "Sports"
+
+    async def test_uses_cache(self, mocker):
+        """Should return cached result if available."""
+        mocker.patch("sibyl.classifier.get_cached", return_value="Geopolitics")
+        res = await classify_event("Some event")
+        assert res == "Geopolitics"
+
+    async def test_uses_llm_success(self, mocker):
+        """Should call LLM and cache result if valid."""
+        mocker.patch("sibyl.classifier.get_cached", return_value=None)
+        set_cached_mock = mocker.patch("sibyl.classifier.set_cached")
+
+        settings_mock = mocker.patch("sibyl.classifier.get_settings")
+        settings_mock.return_value = Settings(openai_api_key="fake", model_classifier="gpt-4o-mini")
+
+        class MockMessage:
+            content = "Sports"
+        class MockChoice:
+            message = MockMessage()
+        class MockResponse:
+            choices = [MockChoice()]
+
+        mocker.patch("litellm.acompletion", return_value=MockResponse())
+        res = await classify_event("NBA Finals")
+        assert res == "Sports"
+        set_cached_mock.assert_called_once()
+
+    async def test_llm_failure_fallback(self, mocker):
+        """Should fallback to keywords if LLM fails."""
+        mocker.patch("sibyl.classifier.get_cached", return_value=None)
+        mocker.patch("sibyl.classifier.set_cached")
+
+        settings_mock = mocker.patch("sibyl.classifier.get_settings")
+        settings_mock.return_value = Settings(openai_api_key="fake")
+
+        mocker.patch("litellm.acompletion", side_effect=Exception("API down"))
+        # Event has 'election' keyword
+        res = await classify_event("election in 2024")
+        assert res == "Geopolitics"
+
+    async def test_no_api_key_fallback(self, mocker):
+        """Should bypass LLM if no API key is configured."""
+        mocker.patch("sibyl.classifier.get_cached", return_value=None)
+        mocker.patch("sibyl.classifier.set_cached")
+
+        settings_mock = mocker.patch("sibyl.classifier.get_settings")
+        settings_mock.return_value = Settings(openai_api_key="")
+
+        res = await classify_event("NBA Finals")
+        assert res == "Sports"

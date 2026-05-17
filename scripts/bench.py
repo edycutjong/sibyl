@@ -67,7 +67,7 @@ async def main():
         avg_brier = sum(brier_scores) / len(brier_scores)
         print(f"📊 Average Brier Score: {avg_brier:.4f}")
         print(f"   Events scored: {len(brier_scores)}/{len(events)}")
-        print(f"   Lower is better (0.0 = perfect, 0.25 = coin flip)")
+        print("   Lower is better (0.0 = perfect, 0.25 = coin flip)")
     else:
         print("⚠️  No events with resolution data for scoring")
 
