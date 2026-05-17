@@ -27,7 +27,7 @@ The harness sends event details as a chat prompt. Your agent must:
 ## System Architecture
 
 ```mermaid
-graph TB
+graph LR
     subgraph "Prophet Arena Evaluation Harness"
         PA["POST /chat/completions<br>OpenAI-compatible"]
     end

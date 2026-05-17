@@ -60,7 +60,7 @@ Event → Category Classifier → Market Price Anchor
 ```
 
 ```mermaid
-graph TB
+graph LR
     subgraph "Prophet Arena Evaluation Harness"
         PA["POST /chat/completions<br>OpenAI-compatible"]
     end
