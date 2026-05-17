@@ -59,7 +59,7 @@ async def main():
                     actual_values = [str(flat_resolved)]
 
             if not actual_values:
-                print(f"   ⚠️  No resolution data — skipping")
+                print("   ⚠️  No resolution data — skipping")
                 continue
 
             # Compute Brier score across all outcomes
@@ -100,27 +100,27 @@ async def main():
         best = float(np.min(scores))
         worst = float(np.max(scores))
 
-        print(f"📊 Brier Score Summary")
+        print("📊 Brier Score Summary")
         print(f"   Events scored : {len(brier_scores)}/{len(events)}")
         print(f"   Errors        : {errors}")
         print()
-        print(f"   ┌────────────┬──────────┐")
-        print(f"   │  Metric    │  Score   │")
-        print(f"   ├────────────┼──────────┤")
+        print("   ┌────────────┬──────────┐")
+        print("   │  Metric    │  Score   │")
+        print("   ├────────────┼──────────┤")
         print(f"   │  Mean      │  {avg:.4f}  │")
         print(f"   │  p50       │  {p50:.4f}  │")
         print(f"   │  p75       │  {p75:.4f}  │")
         print(f"   │  p95       │  {p95:.4f}  │")
         print(f"   │  Best      │  {best:.4f}  │")
         print(f"   │  Worst     │  {worst:.4f}  │")
-        print(f"   └────────────┴──────────┘")
+        print("   └────────────┴──────────┘")
         print()
-        print(f"   (Lower is better: 0.0 = perfect, 0.25 = coin flip)")
+        print("   (Lower is better: 0.0 = perfect, 0.25 = coin flip)")
 
         # Per-category breakdown
         if category_scores:
             print()
-            print(f"   📂 Per-Category Breakdown:")
+            print("   📂 Per-Category Breakdown:")
             for cat, cat_scores in sorted(category_scores.items()):
                 cat_arr = np.array(cat_scores)
                 print(f"      {cat:20s} n={len(cat_scores):2d}  mean={float(np.mean(cat_arr)):.4f}  p50={float(np.percentile(cat_arr, 50)):.4f}")
