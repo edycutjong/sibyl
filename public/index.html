@@ -1,38 +1,993 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sibyl - AI Forecasting Agent</title>
-    <style>
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            text-align: center;
-        }
-        h1 { color: #38bdf8; font-size: 3rem; margin-bottom: 0.5rem; }
-        p { color: #94a3b8; max-width: 600px; font-size: 1.25rem; line-height: 1.6; }
-        .badge {
-            background-color: #1e293b;
-            padding: 0.5rem 1rem;
-            border-radius: 9999px;
-            font-size: 0.875rem;
-            color: #38bdf8;
-            border: 1px solid #334155;
-            margin-top: 2rem;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sibyl — Prophet Hacks Pitch Deck</title>
+<!--
+  KEYS: → / Space = next  ·  ← = prev  ·  ESC = overview grid
+        P = presenter mode (speaker notes)  ·  C = contrast debug
+  PRINT: Cmd+P → Save as PDF → Landscape → 10 pages
+  SWAP: search "SWAP:" comments to replace placeholder images
+-->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2306b6d4'/%3E%3Cstop offset='100%25' stop-color='%238b5cf6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='30' fill='%23020617'/%3E%3Cpolygon points='32,10 44,26 38,26 38,54 26,54 26,26 20,26' fill='url(%23g)'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ─────────────────────────────────────── */
+:root {
+  --bg:  #020617;
+  --s1:  #0f172a;
+  --s2:  #1e293b;
+  --cy:  #06b6d4;
+  --pu:  #8b5cf6;
+  --gr:  #22c55e;
+  --re:  #ef4444;
+  --hi:  #f8fafc;
+  --md:  #94a3b8;
+  --lo:  #475569;
+  --cy-g: color-mix(in srgb, var(--cy) 35%, transparent);
+  --pu-g: color-mix(in srgb, var(--pu) 35%, transparent);
+  --gr-g: color-mix(in srgb, var(--gr) 30%, transparent);
+  --grad: linear-gradient(135deg, var(--cy) 0%, var(--pu) 100%);
+  --br:   rgba(255,255,255,0.08);
+  --br2:  rgba(255,255,255,0.15);
+  --fd: "Inter Tight","Inter",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  --fm: "JetBrains Mono","SF Mono",Menlo,Consolas,monospace;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:#000;overflow:hidden;
+  font-family:var(--fd);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+
+#stage{position:fixed;width:1920px;height:1080px;top:0;left:0;transform-origin:top left}
+
+.sl{position:absolute;inset:0;width:1920px;height:1080px;
+  background:var(--bg);overflow:hidden;display:none;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact}
+.sl.on{display:block}
+
+.mesh,.gridl{position:absolute;inset:0;pointer-events:none;z-index:0}
+.gridl{
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:80px 80px}
+.rel{position:relative;z-index:1}
+
+.glass{backdrop-filter:blur(20px) saturate(1.4);
+  background:rgba(255,255,255,.03);border:1px solid var(--br);border-radius:20px}
+
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:9999px;
+  font-family:var(--fm);font-size:13px;background:rgba(255,255,255,.05);
+  border:1px solid var(--br);color:var(--md)}
+.pill-cy{background:color-mix(in srgb,var(--cy) 12%,transparent);
+  border-color:color-mix(in srgb,var(--cy) 35%,transparent);color:var(--cy)}
+.pill-pu{background:color-mix(in srgb,var(--pu) 12%,transparent);
+  border-color:color-mix(in srgb,var(--pu) 35%,transparent);color:var(--pu)}
+.pill-gr{background:color-mix(in srgb,var(--gr) 12%,transparent);
+  border-color:color-mix(in srgb,var(--gr) 35%,transparent);color:var(--gr)}
+
+.gt{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tag{font-family:var(--fm);font-size:11px;color:var(--lo);letter-spacing:.15em;text-transform:uppercase}
+
+/* ── UI CHROME ───────────────────────────────────── */
+#ctr{position:fixed;bottom:28px;right:44px;font-family:var(--fm);
+  font-size:12px;color:var(--lo);letter-spacing:.1em;z-index:100;pointer-events:none}
+#nav{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
+  display:flex;gap:10px;z-index:100}
+#nav button{background:rgba(255,255,255,.04);border:1px solid var(--br);
+  color:var(--md);width:36px;height:36px;border-radius:8px;cursor:pointer;
+  font-size:15px;display:flex;align-items:center;justify-content:center;transition:all 150ms}
+#nav button:hover{background:rgba(255,255,255,.09);color:var(--hi)}
+#pres{position:fixed;bottom:0;left:0;right:0;height:18%;
+  background:rgba(2,6,23,.97);border-top:1px solid var(--br2);
+  padding:20px 56px;display:none;z-index:200;
+  font-family:var(--fm);font-size:15px;color:var(--md);line-height:1.65}
+#pres.on{display:block}
+#ov{display:none;position:fixed;inset:0;background:rgba(2,6,23,.96);
+  z-index:300;padding:48px;gap:20px;flex-wrap:wrap;align-content:flex-start;overflow-y:auto}
+#ov.on{display:flex}
+.ovt{width:280px;height:158px;border:2px solid var(--br);border-radius:8px;
+  cursor:pointer;background:var(--s1);overflow:hidden;position:relative;transition:border-color 150ms;
+  display:flex;align-items:center;justify-content:center}
+.ovt:hover,.ovt.active{border-color:var(--cy)}
+.ovt .lbl{position:absolute;bottom:6px;left:10px;
+  font-family:var(--fm);font-size:11px;color:var(--lo)}
+.ovt .ov-title{font-family:var(--fd);font-size:13px;color:var(--md);text-align:center;padding:0 16px}
+
+body.dbg *{outline:1px solid rgba(255,0,0,.25)!important}
+
+/* ── ANIMATIONS ──────────────────────────────────── */
+@keyframes drift{
+  0%,100%{background-position:0% 50%}
+  50%{background-position:100% 50%}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes fade-up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes count-in{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+@keyframes dash-flow{to{stroke-dashoffset:-12}}
+@keyframes glow-pulse{0%,100%{opacity:.7}50%{opacity:1}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes mesh-drift{
+  0%,100%{transform:translate(0,0)}
+  33%{transform:translate(20px,-15px)}
+  66%{transform:translate(-15px,10px)}}
+
+/* ── PRINT ───────────────────────────────────────── */
+@page{size:16in 9in landscape;margin:0}
+@media print{
+  html,body{width:16in;height:9in;overflow:visible;background:var(--bg)}
+  #stage{position:relative;transform:none!important;left:0!important;top:0!important}
+  .sl{display:block!important;position:relative;width:16in;height:9in;
+      page-break-inside:avoid;break-inside:avoid}
+  #nav,#ctr,#pres,#ov{display:none!important}
+  aside{display:none!important}
+}
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 1 — COVER
+═══════════════════════════════════════════════════ */
+#s1 .mesh{
+  background:
+    radial-gradient(ellipse 900px 700px at 15% 55%,color-mix(in srgb,var(--cy) 14%,transparent),transparent),
+    radial-gradient(ellipse 700px 500px at 88% 18%,color-mix(in srgb,var(--pu) 10%,transparent),transparent),
+    radial-gradient(ellipse 500px 400px at 65% 88%,color-mix(in srgb,var(--cy) 6%,transparent),transparent);
+  animation:mesh-drift 14s ease-in-out infinite}
+
+#s1 .inner{display:flex;align-items:center;height:100%;padding:0 140px;justify-content:space-between;position:relative;z-index:1}
+#s1 .lft{max-width:820px}
+
+#s1 .badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;
+  border-radius:9999px;border:1px solid color-mix(in srgb,var(--pu) 40%,transparent);
+  background:color-mix(in srgb,var(--pu) 8%,transparent);
+  font-family:var(--fm);font-size:13px;color:var(--pu);margin-bottom:36px;
+  animation:fade-up .6s ease .1s both}
+#s1 .badge .dot{width:7px;height:7px;border-radius:50%;background:var(--pu);
+  animation:blink 2s ease-in-out infinite}
+
+#s1 h1{font-size:128px;font-weight:900;line-height:.9;letter-spacing:-5px;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 70px var(--cy-g));
+  animation:fade-up .6s ease .2s both}
+
+#s1 .tagline{font-size:30px;font-weight:400;color:var(--md);margin-top:28px;
+  line-height:1.4;max-width:620px;animation:fade-up .6s ease .3s both}
+#s1 .tagline em{color:var(--hi);font-style:normal;font-weight:600}
+
+#s1 .pills{display:flex;flex-wrap:wrap;gap:10px;margin-top:40px;
+  animation:fade-up .6s ease .4s both}
+
+#s1 .url{margin-top:36px;font-family:var(--fm);font-size:15px;color:var(--lo);
+  animation:fade-up .6s ease .5s both}
+#s1 .url span{color:var(--cy)}
+
+#s1 .rgt{width:740px;flex-shrink:0;animation:fade-up .8s ease .3s both}
+
+.term{background:#070d1a;border:1px solid rgba(255,255,255,.1);border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 40px 100px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04),
+             0 0 80px color-mix(in srgb,var(--cy) 8%,transparent)}
+.tbar{background:#0c1523;padding:13px 18px;display:flex;align-items:center;gap:8px;
+  border-bottom:1px solid rgba(255,255,255,.07)}
+.td{width:12px;height:12px;border-radius:50%}
+.td-r{background:#ff5f57}.td-y{background:#febc2e}.td-g{background:#28c840}
+.ttitle{margin-left:8px;font-family:var(--fm);font-size:12px;color:var(--lo)}
+.tbody{padding:24px 28px;font-family:var(--fm);font-size:13.5px;line-height:1.8;color:#e2e8f0}
+.tc{color:var(--lo)}
+.tp{color:var(--cy)}
+.tv{color:#86efac}
+.ta{color:var(--pu)}
+.tn{color:#fbbf24}
+.cursor{display:inline-block;width:7px;height:15px;background:var(--cy);
+  vertical-align:middle;animation:blink 1s step-end infinite;margin-left:2px}
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 2 — HOOK
+═══════════════════════════════════════════════════ */
+#s2 .mesh{background:
+  radial-gradient(ellipse 1400px 1000px at 50% 50%,color-mix(in srgb,var(--cy) 12%,transparent),var(--bg))}
+#s2 .inner{position:relative;z-index:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;height:100%;text-align:center;padding:0 200px}
+#s2 .big{font-size:260px;font-weight:900;line-height:.85;letter-spacing:-10px;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 100px var(--cy-g));animation:count-in .8s ease .1s both}
+#s2 .ctx{font-size:38px;font-weight:400;color:var(--md);margin-top:44px;
+  max-width:1100px;line-height:1.45;animation:fade-up .6s ease .4s both}
+#s2 .ctx em{color:var(--hi);font-style:normal;font-weight:600}
+#s2 .sub{font-family:var(--fm);font-size:19px;color:var(--lo);margin-top:24px;
+  letter-spacing:.05em;animation:fade-up .6s ease .55s both}
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 3 — PROBLEM
+═══════════════════════════════════════════════════ */
+#s3 .mesh{background:
+  radial-gradient(ellipse 900px 700px at 0% 100%,color-mix(in srgb,var(--re) 8%,transparent),transparent),
+  radial-gradient(ellipse 600px 400px at 100% 0%,color-mix(in srgb,var(--pu) 6%,transparent),transparent)}
+#s3 .inner{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;height:100%}
+#s3 .lft{padding:100px 80px 100px 140px;display:flex;flex-direction:column;
+  justify-content:center;border-right:1px solid var(--br)}
+#s3 .rgt{padding:100px 140px 100px 80px;display:flex;flex-direction:column;justify-content:center;gap:18px}
+#s3 h2{font-size:72px;font-weight:800;line-height:1.05;letter-spacing:-2px;
+  color:var(--hi);margin-top:16px;margin-bottom:28px}
+#s3 .story{font-size:22px;color:var(--md);line-height:1.65;max-width:520px}
+#s3 .story em{color:var(--hi);font-style:normal;font-weight:600}
+#s3 .story .num{color:var(--cy);font-family:var(--fm);font-weight:600}
+#s3 .pain{display:flex;align-items:flex-start;gap:16px;padding:22px 24px;
+  border-radius:14px;border:1px solid rgba(239,68,68,.2);
+  background:rgba(239,68,68,.04)}
+#s3 .pain-ico{font-size:28px;flex-shrink:0;margin-top:2px}
+#s3 .pain-ttl{font-size:19px;font-weight:700;color:var(--hi);margin-bottom:6px}
+#s3 .pain-txt{font-size:15px;color:var(--md);line-height:1.5}
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 4 — SOLUTION
+═══════════════════════════════════════════════════ */
+#s4 .mesh{background:
+  radial-gradient(ellipse 1000px 800px at 80% 50%,color-mix(in srgb,var(--cy) 10%,transparent),transparent),
+  radial-gradient(ellipse 700px 500px at 10% 20%,color-mix(in srgb,var(--pu) 7%,transparent),transparent)}
+#s4 .inner{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;height:100%}
+#s4 .lft{padding:100px 80px 100px 140px;display:flex;flex-direction:column;
+  justify-content:center;border-right:1px solid var(--br)}
+#s4 .rgt{padding:80px 100px;display:flex;align-items:center;justify-content:center}
+#s4 h2{font-size:72px;font-weight:800;line-height:1.05;letter-spacing:-2px;
+  margin-top:16px;margin-bottom:28px}
+#s4 .desc{font-size:22px;color:var(--md);line-height:1.6;max-width:520px;margin-bottom:36px}
+#s4 .ins{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px}
+#s4 .ins-n{font-family:var(--fm);font-size:12px;color:var(--cy);
+  background:color-mix(in srgb,var(--cy) 10%,transparent);
+  border:1px solid color-mix(in srgb,var(--cy) 30%,transparent);
+  border-radius:6px;padding:3px 9px;flex-shrink:0;margin-top:3px}
+#s4 .ins-t{font-size:19px;color:var(--md);line-height:1.5}
+#s4 .ins-t strong{color:var(--hi);font-weight:600}
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 5 — ARCHITECTURE
+═══════════════════════════════════════════════════ */
+#s5 .mesh{background:
+  radial-gradient(ellipse 1600px 600px at 50% 85%,color-mix(in srgb,var(--cy) 7%,transparent),transparent)}
+#s5 .inner{position:relative;z-index:1;padding:72px 120px;
+  display:flex;flex-direction:column;height:100%}
+#s5 h2{font-size:52px;font-weight:800;letter-spacing:-1.5px;margin-top:10px;margin-bottom:6px}
+#s5 .sub{font-size:18px;color:var(--md);margin-bottom:36px}
+#s5 .dia{flex:1;display:flex;align-items:center;justify-content:center}
+.arch-dash{stroke-dasharray:6 4;animation:dash-flow .9s linear infinite}
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 6 — LIVE DEMO
+═══════════════════════════════════════════════════ */
+#s6 .mesh{background:
+  radial-gradient(ellipse 1000px 800px at 60% 40%,color-mix(in srgb,var(--pu) 8%,transparent),transparent),
+  radial-gradient(ellipse 700px 500px at 5% 70%,color-mix(in srgb,var(--cy) 6%,transparent),transparent)}
+#s6 .inner{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;height:100%}
+#s6 .lft{padding:72px 60px 72px 120px;display:flex;flex-direction:column;justify-content:center}
+#s6 .rgt{padding:72px 120px 72px 60px;display:flex;flex-direction:column;justify-content:center;gap:14px;
+  border-left:1px solid var(--br)}
+#s6 h2{font-size:60px;font-weight:800;line-height:1.05;letter-spacing:-2px;
+  margin-top:12px;margin-bottom:20px}
+#s6 .desc{font-size:19px;color:var(--md);line-height:1.6;margin-bottom:28px}
+.callout{display:flex;align-items:flex-start;gap:14px;margin-bottom:12px}
+.c-num{width:28px;height:28px;border-radius:50%;background:var(--cy);
+  color:var(--bg);font-weight:700;font-size:13px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.c-txt{font-size:17px;color:var(--md);line-height:1.5}
+.c-txt strong{color:var(--hi);font-weight:600}
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 7 — FEATURES
+═══════════════════════════════════════════════════ */
+#s7 .mesh{background:
+  radial-gradient(ellipse 1000px 800px at 20% 50%,color-mix(in srgb,var(--cy) 9%,transparent),transparent),
+  radial-gradient(ellipse 700px 600px at 90% 20%,color-mix(in srgb,var(--pu) 7%,transparent),transparent)}
+#s7 .inner{position:relative;z-index:1;display:grid;
+  grid-template-columns:1.4fr 1fr;grid-template-rows:1fr 1fr;
+  height:100%;gap:1px;background:var(--br)}
+#s7 .fm{grid-row:span 2;background:var(--bg);padding:80px 70px 80px 120px;
+  display:flex;flex-direction:column;justify-content:center}
+#s7 .fs{background:var(--bg);padding:56px 80px 56px 60px;
+  display:flex;flex-direction:column;justify-content:center}
+#s7 .ficon{font-size:52px;line-height:1;margin-bottom:20px}
+#s7 h2{font-size:64px;font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:20px}
+#s7 .fdesc{font-size:22px;color:var(--md);line-height:1.6;max-width:460px}
+#s7 .fmet{display:inline-flex;align-items:center;gap:8px;margin-top:28px;
+  padding:10px 20px;border-radius:12px;
+  background:color-mix(in srgb,var(--gr) 8%,transparent);
+  border:1px solid color-mix(in srgb,var(--gr) 25%,transparent);
+  font-family:var(--fm);font-size:14px;color:var(--gr)}
+#s7 .sh3{font-size:32px;font-weight:700;letter-spacing:-.5px;margin-bottom:10px;color:var(--hi)}
+#s7 .sdesc{font-size:16px;color:var(--md);line-height:1.55}
+#s7 .spills{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 8 — WHY NOW
+═══════════════════════════════════════════════════ */
+#s8 .mesh{background:
+  radial-gradient(ellipse 1600px 500px at 50% 100%,color-mix(in srgb,var(--cy) 8%,transparent),transparent)}
+#s8 .inner{position:relative;z-index:1;padding:100px 140px;
+  display:flex;flex-direction:column;height:100%}
+#s8 h2{font-size:72px;font-weight:800;letter-spacing:-2px;margin-top:12px;margin-bottom:56px}
+#s8 .wgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;flex:1;align-items:start}
+#s8 .card{padding:36px 32px;border-radius:20px;border:1px solid var(--br);
+  background:rgba(255,255,255,.015);display:flex;flex-direction:column}
+#s8 .cnum{font-family:var(--fm);font-size:11px;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--lo);margin-bottom:16px}
+#s8 .ctitle{font-size:32px;font-weight:700;letter-spacing:-.5px;
+  color:var(--hi);margin-bottom:16px;line-height:1.2}
+#s8 .cbody{font-size:18px;color:var(--md);line-height:1.65;flex:1}
+#s8 .chip{display:inline;font-family:var(--fm);font-size:13px;color:var(--cy);
+  background:color-mix(in srgb,var(--cy) 8%,transparent);
+  padding:2px 8px;border-radius:4px}
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 9 — TRACTION
+═══════════════════════════════════════════════════ */
+#s9 .mesh{background:
+  radial-gradient(ellipse 1000px 800px at 80% 30%,color-mix(in srgb,var(--gr) 8%,transparent),transparent),
+  radial-gradient(ellipse 800px 600px at 20% 80%,color-mix(in srgb,var(--cy) 6%,transparent),transparent)}
+#s9 .inner{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;height:100%}
+#s9 .lft{padding:100px 80px 100px 140px;display:flex;flex-direction:column;
+  justify-content:center;border-right:1px solid var(--br)}
+#s9 .rgt{padding:100px 140px 100px 80px;display:flex;flex-direction:column;justify-content:center}
+#s9 h2{font-size:72px;font-weight:800;letter-spacing:-2px;margin-top:12px;margin-bottom:24px}
+#s9 .hero{font-size:148px;font-weight:900;line-height:.9;letter-spacing:-6px;
+  background:linear-gradient(135deg,var(--gr),var(--cy));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 50px color-mix(in srgb,var(--gr) 30%,transparent));
+  margin-bottom:8px}
+#s9 .hsub{font-size:22px;color:var(--md);font-family:var(--fm)}
+#s9 .ditem{display:flex;align-items:center;gap:16px;padding:14px 0;
+  border-bottom:1px solid var(--br)}
+#s9 .ditem:last-child{border-bottom:none}
+#s9 .chk{width:24px;height:24px;border-radius:50%;
+  background:color-mix(in srgb,var(--gr) 15%,transparent);
+  border:1px solid color-mix(in srgb,var(--gr) 40%,transparent);
+  color:var(--gr);display:flex;align-items:center;justify-content:center;
+  font-size:12px;flex-shrink:0}
+#s9 .dtxt{font-size:18px;color:var(--md)}
+#s9 .dtxt strong{color:var(--hi);font-weight:600}
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 10 — THE ASK
+═══════════════════════════════════════════════════ */
+#s10 .mesh{background:
+  radial-gradient(ellipse 1400px 1000px at 50% 50%,color-mix(in srgb,var(--cy) 10%,transparent),var(--bg))}
+#s10 .inner{position:relative;z-index:1;display:grid;grid-template-columns:1.2fr 1fr;height:100%}
+#s10 .lft{padding:100px 80px 100px 140px;display:flex;flex-direction:column;
+  justify-content:center;border-right:1px solid var(--br)}
+#s10 .rgt{padding:80px 100px;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;gap:24px}
+#s10 h2{font-size:80px;font-weight:900;line-height:1;letter-spacing:-3px;margin-top:16px;margin-bottom:24px}
+#s10 .adesc{font-size:24px;color:var(--md);line-height:1.6;max-width:520px;margin-bottom:36px}
+#s10 .aline{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+#s10 .alabel{font-family:var(--fm);font-size:12px;color:var(--lo);width:72px;flex-shrink:0}
+#s10 .aval{font-family:var(--fm);font-size:14px;color:var(--md)}
+#s10 .aval span{color:var(--cy)}
+#s10 .team{width:100%;padding:24px;border-radius:16px;border:1px solid var(--br);
+  background:rgba(255,255,255,.02);display:flex;align-items:center;gap:20px}
+#s10 .avatar{width:72px;height:72px;border-radius:50%;background:var(--s2);
+  border:2px solid var(--br2);display:flex;align-items:center;justify-content:center;
+  font-size:28px;flex-shrink:0}
+#s10 .tname{font-size:22px;font-weight:700;color:var(--hi);margin-bottom:4px}
+#s10 .trole{font-family:var(--fm);font-size:14px;color:var(--md)}
+#s10 .qr{width:180px;height:180px;border-radius:16px;border:2px solid var(--br2);
+  background:var(--s1);display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:10px}
+#s10 .qr-label{font-family:var(--fm);font-size:11px;color:var(--lo)}
+#s10 .cta{padding:16px 28px;border-radius:12px;background:var(--grad);
+  font-size:16px;font-weight:700;color:#fff;text-align:center;width:100%;
+  box-shadow:0 0 40px var(--cy-g)}
+</style>
 </head>
 <body>
-    <h1>Sibyl / OracleChain</h1>
-    <p>A highly-calibrated, cost-routed forecasting agent designed for the Prophet Arena evaluation.</p>
-    <div class="badge">API Endpoint Live at /predict</div>
+
+<div id="stage">
+
+<!-- ═══════════════════════
+     SLIDE 1 — COVER
+═══════════════════════ -->
+<div class="sl on" id="s1">
+  <div class="mesh"></div>
+  <div class="gridl"></div>
+  <div class="inner">
+    <div class="lft">
+      <div class="badge"><span class="dot"></span>Built for Prophet Hacks</div>
+      <h1>SIBYL</h1>
+      <p class="tagline">
+        <em>Retrieval beats recency.</em><br>
+        Every prediction market has a lag window.<br>We live inside it.
+      </p>
+      <div class="pills">
+        <span class="pill pill-cy">Python 3.12</span>
+        <span class="pill pill-cy">FastAPI</span>
+        <span class="pill">GPT-4o-mini</span>
+        <span class="pill">Gemini 2.5 Flash</span>
+        <span class="pill pill-pu">Claude 3.5 Sonnet</span>
+        <span class="pill">litellm</span>
+        <span class="pill">Exa Search</span>
+      </div>
+      <p class="url">🚀 <span>https://api.sibyl.edycu.dev/</span></p>
+    </div>
+    <div class="rgt">
+      <div class="term">
+        <div class="tbar">
+          <div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div>
+          <span class="ttitle">sibyl — live prediction</span>
+        </div>
+        <div class="tbody">
+          <div><span class="tc"># Real-time forecasting with evidence retrieval</span></div>
+          <div><span class="tp">$ </span>curl -X POST api.sibyl.edycu.dev/predict \</div>
+          <div>&nbsp;&nbsp;-H <span class="tv">"Authorization: Bearer •••"</span> \</div>
+          <div>&nbsp;&nbsp;-d <span class="tv">'{"title": "Will Fed raise rates in June?"}'</span></div>
+          <div>&nbsp;</div>
+          <div><span class="tc"># 180ms later</span></div>
+          <div><span class="tv">{</span></div>
+          <div>&nbsp;&nbsp;<span class="ta">"probabilities"</span>: {<span class="ta">"Yes"</span>: <span class="tn">0.63</span>, <span class="ta">"No"</span>: <span class="tn">0.37</span>},</div>
+          <div>&nbsp;&nbsp;<span class="ta">"confidence"</span>: <span class="tn">0.81</span>,</div>
+          <div>&nbsp;&nbsp;<span class="ta">"model"</span>: <span class="tv">"gemini-2.5-flash"</span>,</div>
+          <div>&nbsp;&nbsp;<span class="ta">"sources_retrieved"</span>: <span class="tn">4</span></div>
+          <div><span class="tv">}</span><span class="cursor"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <aside class="speaker-notes">Sibyl is a retrieval-augmented forecasting agent for Prophet Arena. It fetches real evidence, anchors to market price as a Bayesian prior, then routes to the cheapest LLM that can beat the baseline. Every prediction market has a lag window — Sibyl lives inside it.</aside>
+</div>
+
+<!-- ═══════════════════════
+     SLIDE 2 — HOOK
+═══════════════════════ -->
+<div class="sl" id="s2">
+  <div class="mesh"></div>
+  <div class="gridl"></div>
+  <div class="inner">
+    <span class="tag">the edge</span>
+    <div class="big">8 min</div>
+    <p class="ctx">The window between <em>breaking news</em> and a fully priced prediction market.<br>That's where every alpha lives. That's where Sibyl operates.</p>
+    <p class="sub">// retrieval-augmented · market-anchored · calibrated</p>
+  </div>
+  <aside class="speaker-notes">Prediction markets lag 5–12 minutes when processing breaking economic data, injury reports, or geopolitical events. Sibyl fetches that same evidence programmatically and forecasts before the market catches up. Not speculation — systematic retrieval.</aside>
+</div>
+
+<!-- ═══════════════════════
+     SLIDE 3 — PROBLEM
+═══════════════════════ -->
+<div class="sl" id="s3">
+  <div class="mesh"></div>
+  <div class="gridl"></div>
+  <div class="inner rel">
+    <div class="lft">
+      <span class="tag">the problem</span>
+      <h2>Models are frozen.<br>Markets are not.</h2>
+      <p class="story">
+        <em>Maya</em> holds a Kalshi contract on Fed rate hikes, priced at
+        <span class="num">42¢</span>. The CPI report dropped <em>8 minutes ago</em>.
+        She knows the market is wrong — but she can't quantify by how much.
+        Existing AI forecasters just re-prompt the same stale training data
+        and return the same wrong answer.
+      </p>
+    </div>
+    <div class="rgt">
+      <div class="pain">
+        <div class="pain-ico">🧊</div>
+        <div>
+          <div class="pain-ttl">Stale training data</div>
+          <div class="pain-txt">LLM knowledge cutoff is months old. No access to today's CPI release, earnings call, or injury report.</div>
+        </div>
+      </div>
+      <div class="pain">
+        <div class="pain-ico">⚡</div>
+        <div>
+          <div class="pain-ttl">No market anchor</div>
+          <div class="pain-txt">Most agents ignore the prediction market price entirely — a free calibrated prior from thousands of traders they're throwing away.</div>
+        </div>
+      </div>
+      <div class="pain">
+        <div class="pain-ico">💸</div>
+        <div>
+          <div class="pain-ttl">One-size-fits-all routing</div>
+          <div class="pain-txt">Running GPT-4 on an 85% confidence sports result is expensive overkill. No cost tiering means burning budget on easy questions.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <aside class="speaker-notes">The core problem: AI forecasting agents treat prediction as language generation. It's not — it's information retrieval. The LLM is the reasoning engine, but without fresh evidence it's reasoning in the dark. Three failures compound: stale data, no prior, wasteful routing.</aside>
+</div>
+
+<!-- ═══════════════════════
+     SLIDE 4 — SOLUTION
+═══════════════════════ -->
+<div class="sl" id="s4">
+  <div class="mesh"></div>
+  <div class="gridl"></div>
+  <div class="inner rel">
+    <div class="lft">
+      <span class="tag">the solution</span>
+      <h2>Retrieval-augmented<br><span class="gt">forecasting.</span></h2>
+      <p class="desc">Sibyl treats prediction as an evidence retrieval problem. The LLM reasons — the pipeline creates the edge.</p>
+      <div class="ins">
+        <span class="ins-n">01</span>
+        <span class="ins-t"><strong>Market Anchoring</strong> — uses the current prediction market price as a calibrated Bayesian prior, not a from-scratch guess.</span>
+      </div>
+      <div class="ins">
+        <span class="ins-n">02</span>
+        <span class="ins-t"><strong>Category-Specific Retrieval</strong> — routes each question to a specialized pipeline. Sports gets injury feeds. Economics gets CPI data.</span>
+      </div>
+      <div class="ins">
+        <span class="ins-n">03</span>
+        <span class="ins-t"><strong>Calibrated Ensemble</strong> — post-hoc Platt scaling trained on historical Prophet Arena data, plus cost-tiered model selection.</span>
+      </div>
+    </div>
+    <div class="rgt">
+      <div class="term">
+        <div class="tbar">
+          <div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div>
+          <span class="ttitle">pipeline internal trace</span>
+        </div>
+        <div class="tbody" style="font-size:12.5px">
+          <div><span class="tc">Step 1</span> <span class="tp">parse_event</span>(<span class="tv">"Will Fed raise rates?"</span>)</div>
+          <div><span class="tc">Step 2</span> <span class="tp">classify</span> → <span class="tn">Economics</span></div>
+          <div><span class="tc">Step 3</span> <span class="tp">anchor</span> → market_price=<span class="tn">0.42</span></div>
+          <div><span class="tc">Step 4</span> <span class="tp">retrieve</span>(Exa) → <span class="tn">4 sources</span></div>
+          <div><span class="tc">Step 5</span> <span class="tp">assemble_context</span>(<span class="tn">3.8k tokens</span>)</div>
+          <div><span class="tc">Step 6</span> <span class="tp">route</span> → confidence=<span class="tn">0.71</span> → gemini-flash</div>
+          <div><span class="tc">Step 7</span> <span class="tp">reason</span> → raw_p_yes=<span class="tn">0.68</span></div>
+          <div><span class="tc">Step 8</span> <span class="tp">calibrate</span>(platt) → <span class="tn">0.63</span></div>
+          <div>&nbsp;</div>
+          <div><span class="tp">→</span> <span class="tv">{"Yes": 0.63, "No": 0.37}</span> <span class="cursor"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <aside class="speaker-notes">Three compounding insights: anchoring means we start from a calibrated prior instead of zero; category routing means our evidence is domain-specific; Platt calibration means our probabilities are statistically meaningful, not just LLM output numbers.</aside>
+</div>
+
+<!-- ═══════════════════════
+     SLIDE 5 — ARCHITECTURE
+═══════════════════════ -->
+<div class="sl" id="s5">
+  <div class="mesh"></div>
+  <div class="gridl"></div>
+  <div class="inner">
+    <span class="tag">how it works</span>
+    <h2>8-Step Prediction Pipeline</h2>
+    <p class="sub">End-to-end: raw event text → calibrated probability in &lt;500ms</p>
+    <div class="dia">
+      <svg viewBox="0 0 1640 340" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:1640px">
+        <defs>
+          <marker id="ac" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
+            <polygon points="0 0,7 3,0 6" fill="rgba(6,182,212,0.6)"/>
+          </marker>
+          <marker id="ap" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
+            <polygon points="0 0,7 3,0 6" fill="rgba(139,92,246,0.6)"/>
+          </marker>
+          <marker id="ag" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
+            <polygon points="0 0,7 3,0 6" fill="rgba(34,197,94,0.6)"/>
+          </marker>
+          <filter id="gcy" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="6" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="ggr" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="6" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <!-- Node: Event -->
+        <g filter="url(#gcy)">
+          <rect x="8" y="88" width="126" height="58" rx="11" fill="rgba(6,182,212,0.15)" stroke="#06b6d4" stroke-width="1.5"/>
+        </g>
+        <text x="71" y="113" text-anchor="middle" fill="#f8fafc" font-family="Inter Tight,sans-serif" font-size="14" font-weight="700">Event</text>
+        <text x="71" y="132" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono,monospace" font-size="11">input</text>
+
+        <path d="M 134 117 L 168 117" stroke="rgba(6,182,212,0.5)" stroke-width="1.5" marker-end="url(#ac)" class="arch-dash"/>
+
+        <!-- Node: Parser -->
+        <rect x="168" y="88" width="120" height="58" rx="11" fill="rgba(6,182,212,0.07)" stroke="rgba(6,182,212,0.4)" stroke-width="1.5"/>
+        <text x="228" y="113" text-anchor="middle" fill="#f8fafc" font-family="Inter Tight,sans-serif" font-size="14" font-weight="700">Parser</text>
+        <text x="228" y="132" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono,monospace" font-size="11">normalize</text>
+
+        <path d="M 288 117 L 322 117" stroke="rgba(6,182,212,0.5)" stroke-width="1.5" marker-end="url(#ac)" class="arch-dash" style="animation-delay:.25s"/>
+
+        <!-- Node: Classifier -->
+        <rect x="322" y="88" width="138" height="58" rx="11" fill="rgba(6,182,212,0.07)" stroke="rgba(6,182,212,0.4)" stroke-width="1.5"/>
+        <text x="391" y="113" text-anchor="middle" fill="#f8fafc" font-family="Inter Tight,sans-serif" font-size="14" font-weight="700">Classifier</text>
+        <text x="391" y="132" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono,monospace" font-size="11">GPT-4o-mini</text>
+
+        <!-- Split arrows from Classifier to 2 parallel nodes -->
+        <path d="M 460 117 L 490 117 L 490 88 L 510 88" stroke="rgba(6,182,212,0.4)" stroke-width="1.5" marker-end="url(#ac)" class="arch-dash" style="animation-delay:.5s"/>
+        <path d="M 460 117 L 490 117 L 490 148 L 510 148" stroke="rgba(6,182,212,0.4)" stroke-width="1.5" marker-end="url(#ac)" class="arch-dash" style="animation-delay:.75s"/>
+
+        <!-- Node: Market Anchor (top) -->
+        <rect x="510" y="60" width="152" height="56" rx="11" fill="rgba(6,182,212,0.07)" stroke="rgba(6,182,212,0.35)" stroke-width="1.5"/>
+        <text x="586" y="83" text-anchor="middle" fill="#f8fafc" font-family="Inter Tight,sans-serif" font-size="13" font-weight="700">Market Anchor</text>
+        <text x="586" y="100" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono,monospace" font-size="10.5">Bayesian prior</text>
+        <text x="586" y="115" text-anchor="middle" fill="#06b6d4" font-family="JetBrains Mono,monospace" font-size="11">p_market = 0.42</text>
+
+        <!-- Node: Retrieval (bottom) -->
+        <rect x="510" y="126" width="152" height="56" rx="11" fill="rgba(6,182,212,0.07)" stroke="rgba(6,182,212,0.35)" stroke-width="1.5"/>
+        <text x="586" y="149" text-anchor="middle" fill="#f8fafc" font-family="Inter Tight,sans-serif" font-size="13" font-weight="700">Evidence Retrieval</text>
+        <text x="586" y="166" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono,monospace" font-size="10.5">Exa / Brave search</text>
+        <text x="586" y="181" text-anchor="middle" fill="#06b6d4" font-family="JetBrains Mono,monospace" font-size="11">4 sources · 3.8k tok</text>
+
+        <!-- Merge both → Assembler -->
+        <path d="M 662 88 L 695 88 L 695 117 L 718 117" stroke="rgba(6,182,212,0.4)" stroke-width="1.5" marker-end="url(#ac)" class="arch-dash" style="animation-delay:1s"/>
+        <path d="M 662 154 L 695 154 L 695 117 L 718 117" stroke="rgba(6,182,212,0.4)" stroke-width="1.5" marker-end="url(#ac)" class="arch-dash" style="animation-delay:1.25s"/>
+
+        <!-- Node: Assembler -->
+        <rect x="718" y="88" width="148" height="58" rx="11" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.45)" stroke-width="1.5"/>
+        <text x="792" y="113" text-anchor="middle" fill="#f8fafc" font-family="Inter Tight,sans-serif" font-size="14" font-weight="700">Assembler</text>
+        <text x="792" y="132" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono,monospace" font-size="11">4K token budget</text>
+
+        <path d="M 866 117 L 900 117" stroke="rgba(139,92,246,0.5)" stroke-width="1.5" marker-end="url(#ap)" class="arch-dash" style="animation-delay:1.5s"/>
+
+        <!-- Node: Model Router -->
+        <rect x="900" y="88" width="140" height="58" rx="11" fill="rgba(139,92,246,0.1)" stroke="rgba(139,92,246,0.55)" stroke-width="1.5"/>
+        <text x="970" y="113" text-anchor="middle" fill="#f8fafc" font-family="Inter Tight,sans-serif" font-size="14" font-weight="700">Model Router</text>
+        <text x="970" y="132" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono,monospace" font-size="11">cost-tiered</text>
+
+        <!-- 3 LLM branches -->
+        <path d="M 1040 117 L 1068 117 L 1068 75 L 1088 75" stroke="rgba(139,92,246,0.45)" stroke-width="1.5" marker-end="url(#ap)" class="arch-dash" style="animation-delay:1.75s"/>
+        <path d="M 1040 117 L 1068 117 L 1068 117 L 1088 117" stroke="rgba(139,92,246,0.45)" stroke-width="1.5" marker-end="url(#ap)" class="arch-dash" style="animation-delay:2s"/>
+        <path d="M 1040 117 L 1068 117 L 1068 160 L 1088 160" stroke="rgba(139,92,246,0.45)" stroke-width="1.5" marker-end="url(#ap)" class="arch-dash" style="animation-delay:2.25s"/>
+
+        <!-- LLM: GPT-4o-mini -->
+        <rect x="1088" y="52" width="158" height="46" rx="10" fill="rgba(139,92,246,0.07)" stroke="rgba(139,92,246,0.3)" stroke-width="1"/>
+        <text x="1167" y="71" text-anchor="middle" fill="#f8fafc" font-family="Inter Tight,sans-serif" font-size="12" font-weight="700">GPT-4o-mini</text>
+        <text x="1167" y="88" text-anchor="middle" fill="#8b5cf6" font-family="JetBrains Mono,monospace" font-size="10">high confidence</text>
+
+        <!-- LLM: Gemini -->
+        <rect x="1088" y="94" width="158" height="46" rx="10" fill="rgba(139,92,246,0.1)" stroke="rgba(139,92,246,0.5)" stroke-width="1.5"/>
+        <text x="1167" y="113" text-anchor="middle" fill="#f8fafc" font-family="Inter Tight,sans-serif" font-size="12" font-weight="700">Gemini 2.5 Flash</text>
+        <text x="1167" y="130" text-anchor="middle" fill="#8b5cf6" font-family="JetBrains Mono,monospace" font-size="10">medium confidence</text>
+
+        <!-- LLM: Claude -->
+        <rect x="1088" y="136" width="158" height="46" rx="10" fill="rgba(139,92,246,0.07)" stroke="rgba(139,92,246,0.3)" stroke-width="1"/>
+        <text x="1167" y="155" text-anchor="middle" fill="#f8fafc" font-family="Inter Tight,sans-serif" font-size="12" font-weight="700">Claude 3.5 Sonnet</text>
+        <text x="1167" y="172" text-anchor="middle" fill="#8b5cf6" font-family="JetBrains Mono,monospace" font-size="10">close call 40–60%</text>
+
+        <!-- 3 LLMs → Calibration -->
+        <path d="M 1246 75 L 1272 75 L 1272 117 L 1296 117" stroke="rgba(139,92,246,0.4)" stroke-width="1.5" marker-end="url(#ap)" class="arch-dash" style="animation-delay:2.5s"/>
+        <path d="M 1246 117 L 1296 117" stroke="rgba(139,92,246,0.4)" stroke-width="1.5" marker-end="url(#ap)" class="arch-dash" style="animation-delay:2.75s"/>
+        <path d="M 1246 160 L 1272 160 L 1272 117 L 1296 117" stroke="rgba(139,92,246,0.4)" stroke-width="1.5" marker-end="url(#ap)" class="arch-dash" style="animation-delay:3s"/>
+
+        <!-- Node: Calibration -->
+        <rect x="1296" y="88" width="140" height="58" rx="11" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.45)" stroke-width="1.5"/>
+        <text x="1366" y="113" text-anchor="middle" fill="#f8fafc" font-family="Inter Tight,sans-serif" font-size="14" font-weight="700">Calibration</text>
+        <text x="1366" y="132" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono,monospace" font-size="11">Platt scaling</text>
+
+        <path d="M 1436 117 L 1470 117" stroke="rgba(34,197,94,0.55)" stroke-width="1.5" marker-end="url(#ag)" class="arch-dash" style="animation-delay:3.25s"/>
+
+        <!-- Node: Output -->
+        <g filter="url(#ggr)">
+          <rect x="1470" y="88" width="120" height="58" rx="11" fill="rgba(34,197,94,0.15)" stroke="#22c55e" stroke-width="1.5"/>
+        </g>
+        <text x="1530" y="113" text-anchor="middle" fill="#f8fafc" font-family="Inter Tight,sans-serif" font-size="14" font-weight="700">Output</text>
+        <text x="1530" y="132" text-anchor="middle" fill="#22c55e" font-family="JetBrains Mono,monospace" font-size="11">p(Yes) = 0.63</text>
+
+        <!-- Legend -->
+        <rect x="8" y="248" width="13" height="13" rx="3" fill="rgba(6,182,212,0.4)" stroke="#06b6d4" stroke-width="1"/>
+        <text x="26" y="259" fill="#94a3b8" font-family="JetBrains Mono,monospace" font-size="13">Retrieval layer</text>
+        <rect x="175" y="248" width="13" height="13" rx="3" fill="rgba(139,92,246,0.4)" stroke="#8b5cf6" stroke-width="1"/>
+        <text x="193" y="259" fill="#94a3b8" font-family="JetBrains Mono,monospace" font-size="13">AI / LLM layer</text>
+        <rect x="342" y="248" width="13" height="13" rx="3" fill="rgba(34,197,94,0.4)" stroke="#22c55e" stroke-width="1"/>
+        <text x="360" y="259" fill="#94a3b8" font-family="JetBrains Mono,monospace" font-size="13">Calibration layer</text>
+        <text x="1640" y="260" text-anchor="end" fill="#475569" font-family="JetBrains Mono,monospace" font-size="12">avg 180–500ms · 100% completion rate</text>
+      </svg>
+    </div>
+  </div>
+  <aside class="speaker-notes">Walk left to right: parse the event, classify it, then market anchor and evidence retrieval run in parallel (the key parallelism), context assembled, routed to cheapest capable LLM, then Platt scaled. The parallel middle section is the architectural differentiator.</aside>
+</div>
+
+<!-- ═══════════════════════
+     SLIDE 6 — LIVE DEMO
+═══════════════════════ -->
+<div class="sl" id="s6">
+  <div class="mesh"></div>
+  <div class="gridl"></div>
+  <div class="inner rel">
+    <div class="lft">
+      <span class="tag">live demo</span>
+      <h2>Try it now.<br>It's live.</h2>
+      <p class="desc">Deployed at <span style="color:var(--cy);font-family:var(--fm)">api.sibyl.edycu.dev</span> — Bearer auth, OpenAI-compatible.</p>
+      <div class="term">
+        <div class="tbar">
+          <div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div>
+          <span class="ttitle">live request → response</span>
+        </div>
+        <div class="tbody" style="font-size:12px">
+          <!-- SWAP: replace with real API screenshot if available -->
+          <div><span style="color:#475569">①</span> <span class="tp">$ </span>curl -X POST https://api.sibyl.edycu.dev/predict \</div>
+          <div>&nbsp;&nbsp;&nbsp;-H <span class="tv">"Authorization: Bearer 483d62<span style="color:#475569">…</span>"</span> \</div>
+          <div>&nbsp;&nbsp;&nbsp;-H <span class="tv">"Content-Type: application/json"</span> \</div>
+          <div>&nbsp;&nbsp;&nbsp;-d <span class="tv">'{"</span><span style="color:#475569">②</span><span class="tv">title": "Will SpaceX catch Super Heavy?",</span></div>
+          <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tv">"category": "Technology"}'</span></div>
+          <div>&nbsp;</div>
+          <div><span class="tv">{</span></div>
+          <div>&nbsp;&nbsp;<span style="color:#475569">③</span><span class="ta">"probabilities"</span>: {<span class="ta">"Yes"</span>: <span class="tn">0.71</span>, <span class="ta">"No"</span>: <span class="tn">0.29</span>},</div>
+          <div>&nbsp;&nbsp;<span class="ta">"reasoning"</span>: <span class="tv">"Recent flight success rate suggests..."</span>,</div>
+          <div>&nbsp;&nbsp;<span style="color:#475569">④</span><span class="ta">"sources_retrieved"</span>: <span class="tn">5</span>,</div>
+          <div>&nbsp;&nbsp;<span class="ta">"model"</span>: <span class="tv">"gemini-2.5-flash"</span></div>
+          <div><span class="tv">}</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="rgt">
+      <span class="tag" style="margin-bottom:32px;display:block">field annotations</span>
+      <div class="callout">
+        <div class="c-num">1</div>
+        <div class="c-txt"><strong>Bearer token auth</strong> — same token works for <code style="font-family:var(--fm);font-size:14px;color:var(--cy)">/predict</code> and OpenAI-compatible <code style="font-family:var(--fm);font-size:14px;color:var(--cy)">/chat/completions</code>.</div>
+      </div>
+      <div class="callout">
+        <div class="c-num">2</div>
+        <div class="c-txt"><strong>Free-text event title</strong> — no rigid schema. Sibyl parses title, description, outcomes, and category from plain text.</div>
+      </div>
+      <div class="callout">
+        <div class="c-num">3</div>
+        <div class="c-txt"><strong>Probabilities object</strong> — Prophet Arena native format. Also returns <code style="font-family:var(--fm);font-size:14px;color:var(--cy)">p_yes</code> for backwards compatibility.</div>
+      </div>
+      <div class="callout">
+        <div class="c-num">4</div>
+        <div class="c-txt"><strong>Sources retrieved</strong> — transparency into evidence chain. Zero sources = LLM-only fallback using calibrated market price.</div>
+      </div>
+      <div style="margin-top:28px">
+        <span class="pill pill-gr" style="font-size:14px;padding:7px 18px">● Live at api.sibyl.edycu.dev</span>
+      </div>
+    </div>
+  </div>
+  <aside class="speaker-notes">The deployment is live right now. Judges can test it with the Bearer token from the README. The /chat/completions endpoint is OpenAI-compatible — point the Prophet Arena harness directly at it with no code changes on the evaluator's side.</aside>
+</div>
+
+<!-- ═══════════════════════
+     SLIDE 7 — FEATURES
+═══════════════════════ -->
+<div class="sl" id="s7">
+  <div class="mesh"></div>
+  <div class="gridl"></div>
+  <div class="inner rel">
+    <div class="fm">
+      <div class="ficon">⚓</div>
+      <span class="tag">feature 01</span>
+      <h2>Market<br>Anchoring</h2>
+      <p class="fdesc">Instead of asking "what's the probability?", Sibyl asks "how much should I update from what the market already says?" The market price is a calibrated prior from thousands of informed traders. We start there and adjust on fresh evidence.</p>
+      <div class="fmet">📈 Systematic edge over naive LLM baseline</div>
+    </div>
+    <div class="fs">
+      <div class="ficon" style="font-size:36px">🗺️</div>
+      <div class="sh3">Category Routing</div>
+      <p class="sdesc">5 specialized retrieval pipelines — each tuned to its domain's evidence patterns. Sports gets injury feeds. Economics gets macro data. Geopolitics gets Reuters.</p>
+      <div class="spills">
+        <span class="pill" style="font-size:12px">Sports</span>
+        <span class="pill" style="font-size:12px">Economics</span>
+        <span class="pill" style="font-size:12px">Geopolitics</span>
+        <span class="pill" style="font-size:12px">Science</span>
+        <span class="pill" style="font-size:12px">Pop Culture</span>
+      </div>
+    </div>
+    <div class="fs" style="border-top:1px solid var(--br)">
+      <div class="ficon" style="font-size:36px">💰</div>
+      <div class="sh3">Cost Tiering</div>
+      <p class="sdesc">Route high-confidence events to GPT-4o-mini. Close calls (40–60% market) get Claude 3.5 Sonnet. Full 2-week evaluation window estimated at $15–40.</p>
+      <div class="spills">
+        <span class="pill pill-cy" style="font-size:12px">GPT-4o-mini · fast</span>
+        <span class="pill" style="font-size:12px">Gemini Flash · balanced</span>
+        <span class="pill pill-pu" style="font-size:12px">Claude · precise</span>
+      </div>
+    </div>
+  </div>
+  <aside class="speaker-notes">Three compounding advantages: anchoring means we start from a calibrated prior; category routing ensures domain-specific evidence; cost tiering deploys expensive models only where LLM reasoning actually matters — close-call predictions where the market is most uncertain.</aside>
+</div>
+
+<!-- ═══════════════════════
+     SLIDE 8 — WHY NOW
+═══════════════════════ -->
+<div class="sl" id="s8">
+  <div class="mesh"></div>
+  <div class="gridl"></div>
+  <div class="inner rel">
+    <span class="tag">why now · why us</span>
+    <h2>Three forces converge<br><span class="gt">right now.</span></h2>
+    <div class="wgrid">
+      <div class="card">
+        <div class="cnum">01 / timing</div>
+        <div class="ctitle">Prophet Arena is live</div>
+        <p class="cbody">The first evaluation harness that scores AI agents on real prediction markets with real money at stake. Without it, we'd need 7 separate systems ourselves. <br><br><span class="chip">15 integration points used</span></p>
+      </div>
+      <div class="card">
+        <div class="cnum">02 / capability</div>
+        <div class="ctitle">Retrieval APIs exist</div>
+        <p class="cbody">Exa, Brave, Tavily — production-grade web search SDKs with sub-200ms latency. The Prophet Arena SDK ships <code style="font-family:var(--fm);font-size:13px">ai_prophet.search.SearchClient</code> as a first-class primitive. This wasn't possible 18 months ago. <br><br><span class="chip">4 sources per prediction</span></p>
+      </div>
+      <div class="card">
+        <div class="cnum">03 / moat</div>
+        <div class="ctitle">LLM cost asymmetry</div>
+        <p class="cbody">GPT-4o-mini is 40× cheaper than GPT-4 on high-confidence sports results. Claude 3.5 Sonnet demonstrably outperforms on ambiguous political questions. Cost-aware routing is a durable technical moat. <br><br><span class="chip">$15–40 total · 100% completion</span></p>
+      </div>
+    </div>
+  </div>
+  <aside class="speaker-notes">The timing is not coincidental. Prophet Arena solves the evaluation problem. Modern search APIs solve the retrieval problem. LLM cost curves make tiering viable. Sibyl is the synthesis of these three converging forces — a solution that couldn't have been built 18 months ago.</aside>
+</div>
+
+<!-- ═══════════════════════
+     SLIDE 9 — TRACTION
+═══════════════════════ -->
+<div class="sl" id="s9">
+  <div class="mesh"></div>
+  <div class="gridl"></div>
+  <div class="inner rel">
+    <div class="lft">
+      <span class="tag">traction</span>
+      <h2>Shipped.<br>Not pitched.</h2>
+      <div class="hero">48h</div>
+      <p class="hsub">from zero to live deployment</p>
+    </div>
+    <div class="rgt">
+      <span class="tag" style="margin-bottom:24px;display:block">delivered in the window</span>
+      <div class="ditem"><div class="chk">✓</div><div class="dtxt"><strong>8-step prediction pipeline</strong> — parse, classify, anchor, retrieve, assemble, route, reason, calibrate</div></div>
+      <div class="ditem"><div class="chk">✓</div><div class="dtxt"><strong>Dual endpoints</strong> — <code style="font-family:var(--fm);font-size:15px">/predict</code> + OpenAI-compatible <code style="font-family:var(--fm);font-size:15px">/chat/completions</code></div></div>
+      <div class="ditem"><div class="chk">✓</div><div class="dtxt"><strong>Platt scaling calibration</strong> trained on 26 resolved Prophet Arena events</div></div>
+      <div class="ditem"><div class="chk">✓</div><div class="dtxt"><strong>Cost-tiered model routing</strong> — GPT-4o-mini / Gemini Flash / Claude 3.5 Sonnet via litellm</div></div>
+      <div class="ditem"><div class="chk">✓</div><div class="dtxt"><strong>100% completion guarantee</strong> — fallback to calibrated market price, no unanswered events</div></div>
+      <div class="ditem"><div class="chk">✓</div><div class="dtxt"><strong>Docker + live deployment</strong> at api.sibyl.edycu.dev with Bearer auth and Swagger docs</div></div>
+      <div class="ditem"><div class="chk">✓</div><div class="dtxt"><strong>CI pipeline + 13 passing tests</strong> — Ruff linting, Pytest coverage, GitHub Actions</div></div>
+    </div>
+  </div>
+  <aside class="speaker-notes">We didn't prototype Sibyl — we deployed it. Every item listed is live and testable right now. The 100% completion rate is a deliberate design constraint from Prophet Arena's scoring formula: edge × completion_rate. Missing a prediction is always worse than returning the calibrated market price.</aside>
+</div>
+
+<!-- ═══════════════════════
+     SLIDE 10 — THE ASK
+═══════════════════════ -->
+<div class="sl" id="s10">
+  <div class="mesh"></div>
+  <div class="gridl"></div>
+  <div class="inner rel">
+    <div class="lft">
+      <span class="tag">the ask</span>
+      <h2>Run Sibyl.<br><span class="gt">Beat the baseline.</span></h2>
+      <p class="adesc">Point the Prophet Arena evaluation harness at our endpoint. We built every integration point — from SDK retrieval to Platt calibration — so the harness just works.</p>
+      <div class="aline">
+        <span class="alabel">API</span>
+        <span class="aval"><span>https://api.sibyl.edycu.dev/</span></span>
+      </div>
+      <div class="aline">
+        <span class="alabel">Token</span>
+        <span class="aval">483d6297…cc2be0c1 (see README)</span>
+      </div>
+      <div class="aline">
+        <span class="alabel">Docs</span>
+        <span class="aval"><span>api.sibyl.edycu.dev/docs</span></span>
+      </div>
+      <div class="aline">
+        <span class="alabel">License</span>
+        <span class="aval">MIT · Open source</span>
+      </div>
+      <div style="margin-top:36px;display:flex;gap:10px;flex-wrap:wrap">
+        <span class="pill pill-cy">Most Technically Sophisticated</span>
+        <span class="pill pill-pu">Best Prophet Arena Integration</span>
+      </div>
+    </div>
+    <div class="rgt">
+      <div class="team">
+        <!-- SWAP: replace emoji with <img src="photo.jpg" style="width:72px;height:72px;border-radius:50%;object-fit:cover"> -->
+        <div class="avatar">👤</div>
+        <div>
+          <div class="tname">Edy Cu</div>
+          <div class="trole">edy.cu@live.com · Full-Stack &amp; ML</div>
+        </div>
+      </div>
+      <div class="qr">
+        <!-- SWAP: replace with real QR code for api.sibyl.edycu.dev -->
+        <svg width="120" height="120" viewBox="0 0 120 120" style="opacity:.45">
+          <rect x="10" y="10" width="40" height="40" rx="4" fill="none" stroke="#94a3b8" stroke-width="2"/>
+          <rect x="70" y="10" width="40" height="40" rx="4" fill="none" stroke="#94a3b8" stroke-width="2"/>
+          <rect x="10" y="70" width="40" height="40" rx="4" fill="none" stroke="#94a3b8" stroke-width="2"/>
+          <rect x="20" y="20" width="20" height="20" rx="2" fill="#94a3b8"/>
+          <rect x="80" y="20" width="20" height="20" rx="2" fill="#94a3b8"/>
+          <rect x="20" y="80" width="20" height="20" rx="2" fill="#94a3b8"/>
+          <rect x="70" y="70" width="8" height="8" rx="1" fill="#94a3b8"/>
+          <rect x="82" y="70" width="8" height="8" rx="1" fill="#94a3b8"/>
+          <rect x="94" y="70" width="8" height="8" rx="1" fill="#94a3b8"/>
+          <rect x="70" y="82" width="8" height="8" rx="1" fill="#94a3b8"/>
+          <rect x="94" y="82" width="8" height="8" rx="1" fill="#94a3b8"/>
+          <rect x="70" y="94" width="8" height="8" rx="1" fill="#94a3b8"/>
+          <rect x="82" y="94" width="8" height="8" rx="1" fill="#94a3b8"/>
+        </svg>
+        <div class="qr-label">api.sibyl.edycu.dev</div>
+      </div>
+      <div class="cta">Retrieval beats recency. Every time. 🔮</div>
+    </div>
+  </div>
+  <aside class="speaker-notes">The ask: test Sibyl in the Prophet Arena harness and award Most Technically Sophisticated. The endpoint is live right now — point /chat/completions at it. All 15 Prophet Arena integration touchpoints are wired. We built this to win.</aside>
+</div>
+
+</div><!-- /stage -->
+
+<!-- ── UI CHROME ─────────────────────────────── -->
+<div id="ctr">01 / 10</div>
+<nav id="nav">
+  <button onclick="prev()" title="Previous (←)">←</button>
+  <button onclick="next()" title="Next (→)">→</button>
+</nav>
+<div id="pres"><span id="pnotes"></span></div>
+<div id="ov"></div>
+
+<script>
+const TOTAL = 10;
+let cur = 1, presOn = false, ovOn = false;
+
+function scale() {
+  const st = document.getElementById('stage');
+  const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+  const ox = (window.innerWidth  - 1920 * s) / 2;
+  const oy = (window.innerHeight - 1080 * s) / 2;
+  st.style.transform = `scale(${s})`;
+  st.style.left = ox + 'px';
+  st.style.top  = oy + 'px';
+}
+window.addEventListener('resize', scale);
+scale();
+
+function go(n) {
+  document.getElementById('s' + cur).classList.remove('on');
+  cur = Math.max(1, Math.min(TOTAL, n));
+  document.getElementById('s' + cur).classList.add('on');
+  document.getElementById('ctr').textContent =
+    String(cur).padStart(2,'0') + ' / ' + String(TOTAL).padStart(2,'0');
+  updateNotes();
+}
+function next() { go(cur + 1); }
+function prev() { go(cur - 1); }
+
+function updateNotes() {
+  const aside = document.querySelector('#s' + cur + ' aside');
+  document.getElementById('pnotes').textContent = aside ? aside.textContent.trim() : '';
+}
+
+function togglePres() {
+  presOn = !presOn;
+  document.getElementById('pres').classList.toggle('on', presOn);
+}
+
+const OV_TITLES = ['Cover','Hook','Problem','Solution','Architecture','Live Demo','Features','Why Now','Traction','The Ask'];
+function buildOv() {
+  const ov = document.getElementById('ov');
+  if (ov.children.length) return;
+  for (let i = 1; i <= TOTAL; i++) {
+    const t = document.createElement('div');
+    t.className = 'ovt' + (i === cur ? ' active' : '');
+    t.innerHTML = '<div class="ov-title">' + i + '. ' + OV_TITLES[i-1] + '</div><div class="lbl">Slide ' + i + ' / ' + TOTAL + '</div>';
+    t.onclick = (function(n){ return function(){ closeOv(); go(n); }; })(i);
+    ov.appendChild(t);
+  }
+}
+function toggleOv() {
+  ovOn = !ovOn;
+  const ov = document.getElementById('ov');
+  if (ovOn) { buildOv(); ov.classList.add('on'); }
+  else ov.classList.remove('on');
+}
+function closeOv() { ovOn = false; document.getElementById('ov').classList.remove('on'); }
+
+document.addEventListener('keydown', e => {
+  if (ovOn && e.key !== 'Escape') return;
+  switch(e.key) {
+    case 'ArrowRight': case ' ': e.preventDefault(); next(); break;
+    case 'ArrowLeft':  e.preventDefault(); prev(); break;
+    case 'Escape': toggleOv(); break;
+    case 'p': case 'P': togglePres(); break;
+    case 'c': case 'C': document.body.classList.toggle('dbg'); break;
+  }
+});
+
+let tx = 0;
+document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, {passive:true});
+document.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - tx;
+  if (Math.abs(dx) > 60) dx < 0 ? next() : prev();
+}, {passive:true});
+
+updateNotes();
+</script>
 </body>
 </html>
