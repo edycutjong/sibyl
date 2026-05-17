@@ -1,8 +1,7 @@
 """Sibyl — FastAPI server with dual endpoints.
 
 Endpoints:
-  POST /chat/completions  — OpenAI-compatible (Prophet Arena auto-eval)
-  POST /predict           — CLI-compatible (prophet forecast predict --agent-url)
+  POST /predict           — Prophet Arena prediction endpoint (accepts event JSON)
   GET  /health            — Uptime check
   GET  /stats             — Cost/latency monitoring
 """
@@ -12,7 +11,6 @@ from __future__ import annotations
 import json
 import logging
 import time
-import uuid
 from contextlib import asynccontextmanager
 from typing import Any
 
@@ -20,7 +18,7 @@ from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
 
-from sibyl.agent import get_prediction_stats, predict, predict_from_prompt, startup
+from sibyl.agent import get_prediction_stats, predict, startup
 from sibyl.config import get_settings
 from sibyl.model_router import get_cost_stats
 
@@ -50,16 +48,7 @@ async def verify_token(
 # ── Request/Response Models ───────────────────────────────────
 
 
-class ChatMessage(BaseModel):
-    role: str = "user"
-    content: str = ""
 
-
-class ChatRequest(BaseModel):
-    model: str = "sibyl-v1"
-    messages: list[ChatMessage] = []
-    temperature: float = 0.2
-    max_tokens: int = 500
 
 
 class PredictRequest(BaseModel):
@@ -100,54 +89,7 @@ app = FastAPI(
 )
 
 
-# ── POST /chat/completions ────────────────────────────────────
 
-
-@app.post("/chat/completions")
-async def chat_completions(
-    request: ChatRequest,
-    _token: str | None = Depends(verify_token),
-) -> dict[str, Any]:
-    """OpenAI-compatible endpoint for Prophet Arena auto-evaluation.
-
-    Receives a chat request with event details in the user message,
-    returns an OpenAI-shaped response with prediction in content.
-    """
-    # Extract the user prompt
-    prompt = ""
-    for msg in request.messages:
-        if msg.role == "user":
-            prompt = msg.content
-            break
-
-    if not prompt:
-        raise HTTPException(status_code=400, detail="No user message found in request")
-
-    # Run prediction
-    result = await predict_from_prompt(prompt)
-
-    # Format as OpenAI-compatible response
-    return {
-        "id": f"chatcmpl-{uuid.uuid4().hex[:12]}",
-        "object": "chat.completion",
-        "created": int(time.time()),
-        "model": request.model,
-        "choices": [
-            {
-                "index": 0,
-                "message": {
-                    "role": "assistant",
-                    "content": json.dumps(result),
-                },
-                "finish_reason": "stop",
-            }
-        ],
-        "usage": {
-            "prompt_tokens": len(prompt.split()),
-            "completion_tokens": len(json.dumps(result).split()),
-            "total_tokens": len(prompt.split()) + len(json.dumps(result).split()),
-        },
-    }
 
 
 # ── POST /predict ─────────────────────────────────────────────
@@ -158,9 +100,9 @@ async def predict_endpoint(
     request: PredictRequest,
     _token: str | None = Depends(verify_token),
 ) -> dict[str, Any]:
-    """CLI-compatible endpoint for prophet forecast predict --agent-url.
+    """Prophet Arena prediction endpoint.
 
-    Receives raw event JSON, returns prediction directly.
+    Receives raw event JSON, returns prediction probabilities directly.
     """
     event = request.model_dump()
 
@@ -173,6 +115,57 @@ async def predict_endpoint(
 
     result = await predict(event)
     return result
+
+
+# ── POST /chat/completions ────────────────────────────────────
+
+class ChatMessage(BaseModel):
+    role: str
+    content: str
+
+class ChatRequest(BaseModel):
+    model: str
+    messages: list[ChatMessage]
+
+@app.post("/chat/completions")
+async def chat_completions(
+    request: ChatRequest,
+    _token: str | None = Depends(verify_token),
+) -> dict[str, Any]:
+    """OpenAI-compatible chat completions endpoint."""
+    if not request.messages:
+        raise HTTPException(status_code=400, detail="Messages list cannot be empty")
+        
+    prompt = request.messages[0].content
+    if not prompt:
+        raise HTTPException(status_code=400, detail="Prompt content cannot be empty")
+        
+    from sibyl.parser import parse_event_from_prompt, normalize_event
+    
+    raw_event = parse_event_from_prompt(prompt)
+    event = normalize_event(raw_event)
+    
+    result = await predict(event)
+    
+    return {
+        "id": f"chatcmpl-{int(time.time())}",
+        "object": "chat.completion",
+        "created": int(time.time()),
+        "model": request.model,
+        "choices": [{
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": json.dumps(result)
+            },
+            "finish_reason": "stop"
+        }],
+        "usage": {
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0
+        }
+    }
 
 
 # ── GET /health ───────────────────────────────────────────────

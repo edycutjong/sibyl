@@ -176,3 +176,15 @@ class TestPredictEndpointFallback:
             },
         )
         assert response.status_code in (200, 500)
+
+class TestChatCompletionsValidation:
+    def test_chat_requires_non_empty_content(self, client):
+        response = client.post(
+            "/chat/completions",
+            json={
+                "model": "sibyl-v1",
+                "messages": [{"role": "user", "content": ""}],
+            },
+        )
+        assert response.status_code == 400
+        assert "Prompt content cannot be empty" in response.json()["detail"]
