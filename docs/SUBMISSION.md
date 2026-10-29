@@ -36,7 +36,7 @@ We implemented a robust JSON extraction engine using regex and bracket-matching 
 Raw LLM probabilities are systematically miscalibrated — they're overconfident on uncertain questions and underconfident on clear ones. We also struggled with LLMs returning malformed JSON or wrapping their outputs in markdown blocks, causing a 42% benchmark failure rate. We solved this by implementing a 5-strategy JSON parsing engine with a fallback retry loop that strictly enforces schema compliance.
 
 ## Accomplishments that we're proud of
-- **Measurable edge**: On 26 resolved Prophet Arena events, Sibyl achieved a mean Brier score of **0.1644** vs the ~0.201 market baseline — an edge of **+0.0366**, more than double our initial target of +0.018. Reproduce with `python scripts/bench.py`.
+- **Measurable edge**: On 26 resolved Prophet Arena events, Sibyl achieved a mean Brier score of **0.1644** vs the ~0.201 market baseline — an edge of **+0.0366**, more than double our initial target of +0.018. Reproduce with `python scripts/bench.py`. *(Added 2026-10-30: this was an in-sample test on already-resolved events and is not leak-free; see the caveat under Performance Benchmarks in the README.)*
 - **Robustness**: 100% completion rate (26/26). Sibyl answers every question, even with minimal evidence (falling back to calibrated market prices).
 - **Cost-efficiency**: Our tiered model routing keeps the estimated cost for the full 2-week Prophet Arena evaluation window between $15–$40.
 - **Test coverage**: 118 tests across the full pipeline (classifier, retrieval, reasoning, calibration, endpoints).

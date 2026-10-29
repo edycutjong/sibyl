@@ -150,6 +150,13 @@ graph LR
 
 *Measured on 26 resolved events from Prophet Arena `sample-resolved` dataset (`scripts/bench.py`). Run `python scripts/bench.py` to reproduce.*
 
+> **Caveat (added 2026-10-30): treat these numbers as an early in-sample test, not a leak-free forecasting score.** The benchmark ran on 2026-05-17 against events that had already resolved, and three things can let the outcome leak in:
+> 1. The market anchor (`sibyl/anchor.py`) reads Kalshi's `last_price`, which for a closed market can reflect the settled result.
+> 2. Retrieval (`sibyl/retrieval.py`) has no publication-date cutoff, so search can return post-event reports.
+> 3. The Platt calibration (`scripts/calibrate.py`) is trained on the same 26 events it is scored on.
+>
+> The sample is also small (16 of 26 are minor tennis matches). A fair score needs pre-close prices, date-bounded search, a held-out calibration set, or a prospective evaluation where forecasts are locked before outcomes exist.
+
 | Metric | Sibyl | Market Baseline |
 |---|---|---|
 | Brier Score (mean) | **0.1644** | ~0.201 |
