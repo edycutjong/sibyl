@@ -2,18 +2,20 @@
 
 Welcome! Thank you for evaluating Sibyl.
 
-### Live Deployment
-- **API Base URL:** `https://api.sibyl.edycu.dev/`
-- **Swagger Documentation:** `https://api.sibyl.edycu.dev/docs`
-- **Pitch Deck (Landing Page):** `https://api.sibyl.edycu.dev/`
+### Deployment status
+The hosted endpoint (`api.sibyl.edycu.dev`) was live for the Prophet Hacks evaluation window and is **currently offline**. Run Sibyl locally instead (same API, same routes):
+
 - **Demo Video:** [YouTube](https://youtu.be/qD5kDq3NXto)
+- **Pitch Deck:** [`public/index.html`](public/index.html), also served at `http://localhost:8001/` when running locally
 
 ### How to Test the Agent
-The live deployment requires a Bearer token for authentication. You can test the endpoint using the following `curl` command:
-
 ```bash
-curl -X POST https://api.sibyl.edycu.dev/predict \
-  -H "Authorization: Bearer 483d6297928e3cf538c66af2fe92894ccf2be0c1802ca370bd6052d1d7edd6c9" \
+pip install -e ".[dev]"
+cp .env.example .env        # add your model + search API keys and a BEARER_TOKEN
+make dev                    # starts the server on http://localhost:8001 (Swagger at /docs)
+
+curl -X POST http://localhost:8001/predict \
+  -H "Authorization: Bearer $BEARER_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Will SpaceX successfully catch the Super Heavy booster in the next Starship flight?",
@@ -23,7 +25,7 @@ curl -X POST https://api.sibyl.edycu.dev/predict \
   }'
 ```
 
-If you are configuring the Prophet Arena CLI, you can use the same token for the `PA_SERVER_API_KEY` (if passing the token via the Prophet CLI) or configure the agent URL to `https://api.sibyl.edycu.dev/chat/completions`.
+For the Prophet Arena CLI, point the agent URL at `http://localhost:8001/chat/completions` (OpenAI-compatible) and use your `BEARER_TOKEN` as `PA_SERVER_API_KEY`. To verify without API keys: `pip install -e ".[dev]" && make verify`.
 
 ---
 
@@ -38,9 +40,8 @@ If you are configuring the Prophet Arena CLI, you can use the same token for the
 
   <br/>
 
-  [![Live API](https://img.shields.io/badge/🚀_Live-API_Docs-06b6d4?style=for-the-badge)](https://api.sibyl.edycu.dev/docs)
   [![Pitch Video](https://img.shields.io/badge/🎬_Pitch-Video-ef4444?style=for-the-badge)](https://youtu.be/qD5kDq3NXto)
-  [![Pitch Deck](https://img.shields.io/badge/📊_Pitch-Deck-f59e0b?style=for-the-badge)](https://api.sibyl.edycu.dev/)
+  [![Pitch Deck](https://img.shields.io/badge/📊_Pitch-Deck-f59e0b?style=for-the-badge)](public/index.html)
   [![Built for Prophet Hacks](https://img.shields.io/badge/Devpost-Prophet_Hacks-8b5cf6?style=for-the-badge)](https://devpost.com/software/sibyl-o8w2xz/)
 
   <br/>
